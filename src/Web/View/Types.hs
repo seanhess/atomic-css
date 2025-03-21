@@ -1,5 +1,5 @@
-{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DerivingStrategies #-}
 
@@ -389,6 +389,7 @@ class Style cls value where
   styleValue :: value -> StyleValue
   default styleValue :: (ToStyleValue value) => value -> StyleValue
   styleValue = toStyleValue
+
 
 class ToClass cls value where
   toClass :: value -> Class

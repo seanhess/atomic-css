@@ -3,12 +3,20 @@
 
 module Main where
 
+import Data.Bifunctor (first)
+import Data.Function ((&))
+import Data.Map (Map)
+import Data.Map.Strict qualified as M
 import Data.String.Interpolate (i)
 import Data.Text (Text)
+import Debug.Trace
 import Network.HTTP.Types (status200, status404)
 import Network.Wai
 import Network.Wai.Handler.Warp as Warp
 import Web.View
+import Web.View.Render
+import Web.View.Style
+import Web.View.Types
 
 
 main :: IO ()
@@ -87,6 +95,58 @@ holygrail = layout id $ do
         text "Content Bottom Right"
     col (bg Secondary) "Right Sidebar"
   row (bg Primary) "Bottom Bar"
+
+
+tooltips :: View c ()
+tooltips = do
+  col (pad 10 . gap 10 . width 300) $ do
+    el bold "CSS ONLY TOOLTIPS"
+    mapM_ viewItemRow ["One", "Two", "Three", "Four", "Five", "Six"]
+ where
+  viewItemRow item = do
+    -- you must have a name?
+    stack (hover (children "tooltip" visible)) $ do
+      layer id $ el (border 1 . bg White) $ text item
+      layer (popup (TR 10 10) . tooltip . zIndex 1 . hidden) $ do
+        viewTooltipDetails item
+
+  viewTooltipDetails item =
+    col (border 2 . gap 5 . bg White . pad 5) $ do
+      el bold "ITEM DETAILS"
+      el_ $ text item
+      el_ "details lorem blah blah blah"
+
+  tooltip = addClass $ cls "tooltip"
+
+
+-- TODO: run the mod, any classes added should be modified
+-- this will ignore any attributes you add!
+children :: Text -> Mod id -> Mod id
+children child f atts =
+  let Attributes cs _ = f mempty
+      final =
+        Attributes
+          { classes = atts.classes <> retargetCSS cs
+          , other = atts.other
+          }
+   in trace (show $ final) final
+ where
+  retargetCSS :: Map Selector Class -> Map Selector Class
+  retargetCSS classes =
+    M.fromList $ fmap (\(s, c) -> (targetChildren s, c{selector = targetChildren s})) $ M.toList classes
+
+  targetChildren :: Selector -> Selector
+  targetChildren sel =
+    let res = sel{className = sel.className, child = Just $ ChildWithName child}
+     in trace (show (selectorText sel, selectorText res)) res
+
+
+visible :: Mod id
+visible = addClass $ cls "visible" & prop @Text "visibility" "visible"
+
+
+hidden :: Mod id
+hidden = addClass $ cls "hidden" & prop @Text "visibility" "hidden"
 
 
 stacks :: View c ()
@@ -210,6 +270,7 @@ examples = col (pad 20 . gap 15) $ do
   link "stacks" lnk "Stacks"
   link "text" lnk "Text"
   link "inputs" lnk "Inputs"
+  link "tooltips" lnk "Tooltips"
  where
   lnk = color Primary
 
@@ -224,6 +285,7 @@ app req respond = do
     ["stacks"] -> view stacks
     ["text"] -> view texts
     ["inputs"] -> view inputs
+    ["tooltips"] -> view tooltips
     _ -> notFound
  where
   html h =
