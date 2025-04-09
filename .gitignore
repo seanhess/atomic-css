@@ -1,5 +1,6 @@
 dist-newstyle
 node_modules
+Session.vim
 dist
 .DS_Store
 tags

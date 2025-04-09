@@ -4,13 +4,13 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 
-name:           web-view
-version:        0.7.0
+name:           atomic-css
+version:        0.8.0
 synopsis:       Type-safe HTML and CSS with intuitive layouts and composable styles.
 description:    Type-safe HTML and CSS with intuitive layouts and composable styles. Inspired by Tailwindcss and Elm-UI . See documentation for the @Web.View@ module below
 category:       Web
-homepage:       https://github.com/seanhess/web-view
-bug-reports:    https://github.com/seanhess/web-view/issues
+homepage:       https://github.com/seanhess/atomic-css
+bug-reports:    https://github.com/seanhess/atomic-css/issues
 author:         Sean Hess
 maintainer:     seanhess@gmail.com
 license:        BSD-3-Clause
@@ -27,23 +27,31 @@ extra-doc-files:
 
 source-repository head
   type: git
-  location: https://github.com/seanhess/web-view
+  location: https://github.com/seanhess/atomic-css
 
 library
   exposed-modules:
-      Web.View
-      Web.View.Element
-      Web.View.Layout
-      Web.View.Render
-      Web.View.Reset
-      Web.View.Style
-      Web.View.Types
-      Web.View.Types.Url
-      Web.View.View
+      Web.Atomic
+      Web.Atomic.CSS
+      Web.Atomic.CSS.Box
+      Web.Atomic.CSS.Layout
+      Web.Atomic.CSS.Reset
+      Web.Atomic.CSS.Select
+      Web.Atomic.CSS.Text
+      Web.Atomic.CSS.Transition
+      Web.Atomic.Html
+      Web.Atomic.Render
+      Web.Atomic.Types
+      Web.Atomic.Types.Attributable
+      Web.Atomic.Types.ClassName
+      Web.Atomic.Types.Rule
+      Web.Atomic.Types.Selector
+      Web.Atomic.Types.Style
+      Web.Atomic.Types.Styleable
   other-modules:
-      Paths_web_view
+      Paths_atomic_css
   autogen-modules:
-      Paths_web_view
+      Paths_atomic_css
   hs-source-dirs:
       src
   default-extensions:
@@ -51,9 +59,15 @@ library
       OverloadedRecordDot
       DuplicateRecordFields
       NoFieldSelectors
+      TypeFamilies
+      DerivingStrategies
+      DefaultSignatures
+      DeriveAnyClass
   ghc-options: -Wall -fdefer-typed-holes
   build-depends:
       base >=4.16 && <5
+    , blaze-html
+    , blaze-markup
     , bytestring >=0.11 && <0.13
     , casing >0.1.3.0 && <0.2
     , containers >=0.6 && <1
@@ -61,7 +75,6 @@ library
     , file-embed >=0.0.10 && <0.1
     , html-entities >=1.1.4.7 && <1.2
     , http-types ==0.12.*
-    , string-interpolate >=0.3.2 && <0.4
     , text >=1.2 && <3
   default-language: GHC2021
 
@@ -69,13 +82,14 @@ test-suite test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Test.AttributeSpec
       Test.RenderSpec
+      Test.RuleSpec
       Test.StyleSpec
-      Test.UrlSpec
-      Test.ViewSpec
-      Paths_web_view
+      Test.UtilitySpec
+      Paths_atomic_css
   autogen-modules:
-      Paths_web_view
+      Paths_atomic_css
   hs-source-dirs:
       test/
   default-extensions:
@@ -83,9 +97,16 @@ test-suite test
       OverloadedRecordDot
       DuplicateRecordFields
       NoFieldSelectors
+      TypeFamilies
+      DerivingStrategies
+      DefaultSignatures
+      DeriveAnyClass
   ghc-options: -Wall -fdefer-typed-holes -threaded -rtsopts -with-rtsopts=-N -F -pgmF=skeletest-preprocessor
   build-depends:
-      base >=4.16 && <5
+      atomic-css
+    , base >=4.16 && <5
+    , blaze-html
+    , blaze-markup
     , bytestring >=0.11 && <0.13
     , casing >0.1.3.0 && <0.2
     , containers >=0.6 && <1
@@ -94,7 +115,5 @@ test-suite test
     , html-entities >=1.1.4.7 && <1.2
     , http-types ==0.12.*
     , skeletest
-    , string-interpolate >=0.3.2 && <0.4
     , text >=1.2 && <3
-    , web-view
   default-language: GHC2021

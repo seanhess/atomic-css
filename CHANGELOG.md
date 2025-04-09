@@ -1,4 +1,4 @@
-# Revision history for web-view
+# Revision history for atomic-css
 
 ## 0.7.0
 

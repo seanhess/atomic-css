@@ -1,7 +1,7 @@
-Web View
+Atomic CSS
 ============
 
-[![Hackage](https://img.shields.io/hackage/v/web-view.svg)][hackage]
+[![Hackage](https://img.shields.io/hackage/v/atomic-css.svg)][hackage]
 
 Type-safe HTML and CSS with intuitive layout and composable styles. Inspired by Tailwindcss and Elm-UI
 
@@ -73,28 +73,28 @@ el (width 100 . media (MinWidth 800) (width 400))
 
 ### Try Example Project with Nix
 
-If you want to get a feel for web-view without cloning the project run `nix run github:seanhess/web-view` to run the example webserver locally
+If you want to get a feel for atomic-css without cloning the project run `nix run github:seanhess/atomic-css` to run the example webserver locally
 
 Import Flake
 ------------
 
-You can import this flake's overlay to add `web-view` to `overriddenHaskellPackages` and which provides a ghc966 and ghc982 package set that satisfy `web-view`'s dependencies.
+You can import this flake's overlay to add `atomic-css` to `overriddenHaskellPackages` and which provides a ghc966 and ghc982 package set that satisfy `atomic-css`'s dependencies.
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    web-view.url = "github:seanhess/web-view"; # or "path:/path/to/cloned/web-view";
+    atomic-css.url = "github:seanhess/atomic-css"; # or "path:/path/to/cloned/atomic-css";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, web-view, flake-utils, ... }:
+  outputs = { self, nixpkgs, atomic-css, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ web-view.overlays.default ];
+          overlays = [ atomic-css.overlays.default ];
         };
         haskellPackagesOverride = pkgs.overriddenHaskellPackages.ghc966.override (old: {
           overrides = pkgs.lib.composeExtensions (old.overrides or (_: _: { })) (hfinal: hprev: {
@@ -104,7 +104,7 @@ You can import this flake's overlay to add `web-view` to `overriddenHaskellPacka
       in
       {
         devShells.default = haskellPackagesOverride.shellFor {
-          packages = p: [ p.web-view ];
+          packages = p: [ p.atomic-css ];
         };
       }
     );
@@ -116,16 +116,16 @@ Local Development
 
 ### Recommended ghcid command
 
-If you want to work on both the web-view library and example code, this `ghcid` command will run and reload the examples server as you change any non-testing code.
+If you want to work on both the atomic-css library and example code, this `ghcid` command will run and reload the examples server as you change any non-testing code.
 
 ```
-ghcid --command="cabal repl exe:example lib:web-view" --run=Main.main --warnings --reload=./embed/preflight.css
+ghcid --command="cabal repl exe:example lib:atomic-css" --run=Main.main --warnings --reload=./embed/preflight.css
 ```
 
 If you want to work on the test suite, this will run the tests each time any library code is changed.
 
 ```
-ghcid --command="cabal repl test lib:web-view" --run=Main.main --warnings --reload=./embed/preflight.css
+ghcid --command="cabal repl test lib:atomic-css" --run=Main.main --warnings --reload=./embed/preflight.css
 ```
 
 ### Nix
@@ -136,7 +136,7 @@ ghcid --command="cabal repl test lib:web-view" --run=Main.main --warnings --relo
     - `nix run .#ghc966-example` to start the example project with GHC 9.6.6
 - `nix develop` or `nix develop .#ghc982-shell` to get a shell with all dependencies installed for GHC 9.8.2. 
     - `nix develop .#ghc966-shell` to get a shell with all dependencies installed for GHC 9.6.6. 
-- `nix build`, `nix build .#ghc982-web-view` and `nix build .#ghc966-web-view` builds the library with the `overriddenHaskellPackages`
+- `nix build`, `nix build .#ghc982-atomic-css` and `nix build .#ghc966-atomic-css` builds the library with the `overriddenHaskellPackages`
     - If you want to import this flake, use the overlay
 - `nix flake update nixpkgs` will update the Haskell package sets and development tools
 
@@ -165,15 +165,15 @@ Learn More
 ----------
 
 View Documentation on [Hackage][hackage]
-* https://hackage.haskell.org/package/web-view
+* https://hackage.haskell.org/package/atomic-css
 
 View on Github
-* https://github.com/seanhess/web-view
+* https://github.com/seanhess/atomic-css
 
-View [Examples](https://github.com/seanhess/web-view/blob/latest/example/app/Main.hs)
+View [Examples](https://github.com/seanhess/atomic-css/blob/latest/example/app/Main.hs)
 
 
-[hackage]: https://hackage.haskell.org/package/web-view
+[hackage]: https://hackage.haskell.org/package/atomic-css
 
 
 Contributors

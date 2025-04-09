@@ -67,6 +67,9 @@ executable example
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
+    other-modules:
+        Example.Blaze
+
     default-extensions:
       OverloadedStrings
       OverloadedRecordDot
@@ -76,13 +79,18 @@ executable example
     -- Other library packages from which modules are imported.
     build-depends:
       base >=4.16,
-      web-view,
+      atomic-css,
       containers,
       http-types,
       string-interpolate,
       text,
       wai,
-      warp
+      warp,
+      blaze-html,
+      blaze-markup,
+      bytestring,
+      effectful
+
 
     -- Directories containing source files.
     hs-source-dirs:   app
