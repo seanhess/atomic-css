@@ -6,6 +6,7 @@ module Web.Atomic.CSS
   , module Web.Atomic.CSS.Layout
   , module Web.Atomic.Types.Styleable
   , module Web.Atomic.Types.Style
+  , Media (..)
   , module Web.Atomic.CSS.Reset
   -- not sure where to put these
   , list

@@ -2,6 +2,7 @@ module Test.AttributeSpec where
 
 import Data.Map.Strict qualified as M
 import Skeletest
+import Web.Atomic.Attributes
 import Web.Atomic.CSS
 import Web.Atomic.Html
 import Web.Atomic.Types
@@ -38,3 +39,19 @@ spec = do
                 )
               $ text "contents"
       pure ()
+
+  describe "class_" $ do
+    it "replaces with att" $ do
+      let Attributes m = mempty @ att "class" "one" . att "class" "two"
+      M.elems m `shouldBe` ["one"]
+
+      let Attributes m2 = mempty @ att "class" "one" @ att "class" "two"
+      M.elems m2 `shouldBe` ["two"]
+
+    it "merges when composed" $ do
+      let Attributes m = mempty @ class_ "one" . class_ "two"
+      M.elems m `shouldBe` ["one two"]
+
+    it "merges when attributed" $ do
+      let Attributes m2 = mempty @ class_ "one" @ class_ "two"
+      M.elems m2 `shouldBe` ["two one"]
