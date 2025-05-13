@@ -78,8 +78,8 @@ element nm = Element False nm mempty mempty mempty
 
 
 instance Attributable (Html a) where
-  setAttribute n av h =
-    mapElement (\elm -> elm{attributes = M.insert n av elm.attributes}) h
+  modAttributes f h =
+    mapElement (\elm -> elm{attributes = f elm.attributes}) h
 
 
 tag :: Text -> Html () -> Html ()

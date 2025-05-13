@@ -17,11 +17,12 @@ newtype Attributes h = Attributes (Map Name AttValue)
 class Attributable h where
   (@) :: h -> (Attributes h -> Attributes h) -> h
   h @ f =
-    let Attributes atts = f mempty
-     in M.foldrWithKey setAttribute h atts
+    flip modAttributes h $ \m ->
+      let Attributes atts = f $ Attributes m
+      in atts
 
 
-  setAttribute :: Name -> AttValue -> h -> h
+  modAttributes :: (Map Name AttValue -> Map Name AttValue) -> h -> h
 
 
 infixl 5 @
@@ -35,16 +36,16 @@ instance {-# OVERLAPPABLE #-} (Attributable a, Attributable b) => Attributable (
        in Attributes m2
 
 
-  setAttribute n av hh = \content ->
-    setAttribute n av $ hh content
+  modAttributes f hh = \content ->
+    modAttributes f $ hh content
 
 
 instance Attributable (Map Name AttValue) where
-  setAttribute = M.insert
+  modAttributes f m = f m
 
 
 instance Attributable (Attributes h) where
-  setAttribute n v (Attributes m) = Attributes $ M.insert n v m
+  modAttributes f (Attributes m) = Attributes $ f m
 
 
 att :: (Attributable h) => Name -> AttValue -> Attributes h -> Attributes h

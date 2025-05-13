@@ -6,19 +6,13 @@ import Web.Atomic.Types.Selector
 import Web.Atomic.Types.Style
 
 
--- CHECKLIST REQUIREMENTS
--- DONE: hover only works on utilities
--- DONE: changing a utility overrides the previous one
--- DONE: can add custom css
--- DONE: utilities can set multiple properties
--- DONE: if you override ANY property in a utility it is removed
--- DONE: don't override different pseudo states
 
 class Styleable h where
   (~) :: h -> (CSS h -> CSS h) -> h
   h ~ f =
-    let new = runCSS f
-     in modCSS (uniqueRules . (new <>)) h
+    flip modCSS h $ \rs ->
+      let CSS new = f $ CSS rs
+      in uniqueRules new
 
 
   modCSS :: ([Rule] -> [Rule]) -> h -> h
