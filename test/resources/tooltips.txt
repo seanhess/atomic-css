@@ -1,0 +1,81 @@
+<style type='text/css'>
+.bg-fff { background-color:#FFF }
+.bold { font-weight:bold }
+.brd-1 { border-width:1px }
+.brd-2 { border-width:0.125rem }
+.brds-solid { border-style:solid }
+.clr-f00-hover:hover { color:#F00 }
+.gap-10 { gap:0.625rem }
+.gap-5 { gap:0.3125rem }
+.hidden { visibility:hidden }
+.pad-10 { padding:0.625rem }
+.pad-5 { padding:0.3125rem }
+.pos-absolute { position:absolute }
+.right-10 { right:0.625rem }
+.row { display:flex; flex-direction:row }
+.stack { position:relative; display:grid; overflow:visible }
+.stack-child > * { grid-area:1 / 1; min-height:fit-content }
+.tooltips:hover > .tooltip { visibility:visible }
+.top-10 { top:0.625rem }
+.w-300 { width:18.75rem; flex-shrink:0 }
+.z-1 { z-index:1 }
+</style>
+
+<div class='gap-10 pad-10 row w-300'>
+  <div class='bold'>CSS ONLY TOOLTIPS</div>
+  <div>some stuff</div>
+  sometext<div class='clr-f00 stack stack-child tooltips'>
+    <div class='bg-fff brd-1 brds-solid'>One</div>
+    <div class='hidden pos-absolute right-10 tooltip top-10 z-1'>
+      <div class='bg-fff brd-2 brds-solid gap-5 pad-5 row'>
+        <div class='bold'>ITEM DETAILS</div>
+        <div>One</div>
+      </div>
+    </div>
+  </div>
+  <div class='clr-f00 stack stack-child tooltips'>
+    <div class='bg-fff brd-1 brds-solid'>Two</div>
+    <div class='hidden pos-absolute right-10 tooltip top-10 z-1'>
+      <div class='bg-fff brd-2 brds-solid gap-5 pad-5 row'>
+        <div class='bold'>ITEM DETAILS</div>
+        <div>Two</div>
+      </div>
+    </div>
+  </div>
+  <div class='clr-f00 stack stack-child tooltips'>
+    <div class='bg-fff brd-1 brds-solid'>Three</div>
+    <div class='hidden pos-absolute right-10 tooltip top-10 z-1'>
+      <div class='bg-fff brd-2 brds-solid gap-5 pad-5 row'>
+        <div class='bold'>ITEM DETAILS</div>
+        <div>Three</div>
+      </div>
+    </div>
+  </div>
+  <div class='clr-f00 stack stack-child tooltips'>
+    <div class='bg-fff brd-1 brds-solid'>Four</div>
+    <div class='hidden pos-absolute right-10 tooltip top-10 z-1'>
+      <div class='bg-fff brd-2 brds-solid gap-5 pad-5 row'>
+        <div class='bold'>ITEM DETAILS</div>
+        <div>Four</div>
+      </div>
+    </div>
+  </div>
+  <div class='clr-f00 stack stack-child tooltips'>
+    <div class='bg-fff brd-1 brds-solid'>Five</div>
+    <div class='hidden pos-absolute right-10 tooltip top-10 z-1'>
+      <div class='bg-fff brd-2 brds-solid gap-5 pad-5 row'>
+        <div class='bold'>ITEM DETAILS</div>
+        <div>Five</div>
+      </div>
+    </div>
+  </div>
+  <div class='clr-f00 stack stack-child tooltips'>
+    <div class='bg-fff brd-1 brds-solid'>Six</div>
+    <div class='hidden pos-absolute right-10 tooltip top-10 z-1'>
+      <div class='bg-fff brd-2 brds-solid gap-5 pad-5 row'>
+        <div class='bold'>ITEM DETAILS</div>
+        <div>Six</div>
+      </div>
+    </div>
+  </div>
+</div>

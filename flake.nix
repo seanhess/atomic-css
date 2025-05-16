@@ -1,5 +1,5 @@
 {
-  description = "web-view overlay, development and examples";
+  description = "atomic-css overlay, development and examples";
 
   nixConfig = {
     extra-substituters = [
@@ -29,7 +29,7 @@
       pre-commit-hooks,
     }:
     let
-      packageName = "web-view";
+      packageName = "atomic-css";
       examplesName = "example";
       src = nix-filter.lib {
         root = ./.;

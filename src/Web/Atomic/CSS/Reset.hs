@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Web.View.Reset where
+module Web.Atomic.CSS.Reset where
 
 import Data.ByteString
 import Data.FileEmbed

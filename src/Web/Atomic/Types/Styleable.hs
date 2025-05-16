@@ -1,0 +1,77 @@
+module Web.Atomic.Types.Styleable where
+
+import Web.Atomic.Types.ClassName
+import Web.Atomic.Types.Rule as Rule
+import Web.Atomic.Types.Selector
+import Web.Atomic.Types.Style
+
+
+class Styleable h where
+  (~) :: h -> (CSS h -> CSS h) -> h
+  h ~ f =
+    flip modCSS h $ \rs ->
+      let CSS new = f $ CSS rs
+       in uniqueRules new
+
+
+  modCSS :: ([Rule] -> [Rule]) -> h -> h
+
+
+infixl 5 ~
+
+
+instance {-# OVERLAPPABLE #-} (Styleable a, Styleable b) => Styleable (a -> b) where
+  (~) :: (a -> b) -> (CSS (a -> b) -> CSS (a -> b)) -> (a -> b)
+  hh ~ f = \content ->
+    hh content ~ \(CSS m) ->
+      let CSS m2 = f $ CSS m
+       in CSS m2
+
+
+  modCSS r hh = \content ->
+    modCSS r $ hh content
+
+
+instance Styleable [Rule] where
+  modCSS f rs = f rs
+
+
+instance Styleable (CSS h) where
+  modCSS f (CSS rs) = CSS $ f rs
+
+
+newtype CSS h = CSS {rules :: [Rule]}
+  deriving newtype (Monoid, Semigroup)
+
+
+mapRules :: (Rule -> Rule) -> CSS a -> CSS a
+mapRules f (CSS rs) = CSS $ fmap f rs
+
+
+cls :: (Styleable h) => ClassName -> CSS h -> CSS h
+cls cn (CSS rs) =
+  CSS $ Rule.fromClass cn : rs
+
+
+-- Custom CSS
+css :: (Styleable h) => ClassName -> Selector -> [Declaration] -> CSS h -> CSS h
+css cn sel ds (CSS rs) =
+  CSS $ Rule cn (CustomRule sel) mempty ds : rs
+
+
+utility :: (Styleable h) => ClassName -> [Declaration] -> CSS h -> CSS h
+utility cn ds (CSS rs) =
+  CSS $ rule cn ds : rs
+
+
+-- | Get all the rules for combined utilities
+rules :: (CSS [Rule] -> CSS [Rule]) -> [Rule]
+rules f =
+  let CSS rs = f mempty
+   in rs
+
+
+-- | Get all the declarations for a utility or combination of them
+declarations :: (CSS [Rule] -> CSS [Rule]) -> [Declaration]
+declarations f =
+  mconcat $ fmap (.properties) (rules f)
