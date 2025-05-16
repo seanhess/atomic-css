@@ -11,15 +11,15 @@ spec = do
   describe "display" $ do
     it "sets display:none, display:block" $ do
       let CSS rs = mempty ~ display None
-      fmap (.properties) rs `shouldBe` [[Declaration "display" "none"]]
+      fmap (.properties) rs `shouldBe` [["display" :. "none"]]
 
       let CSS rs2 = mempty ~ display Block
-      fmap (.properties) rs2 `shouldBe` [[Declaration "display" "block"]]
+      fmap (.properties) rs2 `shouldBe` [["display" :. "block"]]
 
   describe "TRBL" $ do
     it "sets all" $ do
       let CSS rs = mempty ~ pad 1
-      mconcat (fmap (.properties) rs) `shouldBe` [Declaration "padding" "1px"]
+      mconcat (fmap (.properties) rs) `shouldBe` ["padding" :. "1px"]
 
     it "sets XY" $ do
       let CSS rs = mempty ~ pad (XY 1 0)
@@ -52,7 +52,7 @@ spec = do
       shouldHaveDeclaration "padding-right" "0px" dcls
 
 
-shouldHaveDeclaration :: Atomic.Property -> StyleValue -> [Declaration] -> IO ()
+shouldHaveDeclaration :: Atomic.Property -> Style -> [Declaration] -> IO ()
 shouldHaveDeclaration p v ds = do
-  let dcl = Declaration p v
+  let dcl = p :. v
   find (== dcl) ds `shouldBe` (Just dcl)

@@ -5,7 +5,6 @@ module Web.Atomic.Html where
 
 import Data.List qualified as L
 import Data.Map.Strict (Map)
-import Data.Map.Strict qualified as M
 import Data.String (IsString (..))
 import Data.Text (Text, pack)
 import GHC.Exts (IsList (..))

@@ -108,7 +108,7 @@ hasAnyProperty ps r = any hasProperty ps
 
 ruleProperties :: Rule -> [Property]
 ruleProperties r =
-  fmap (\(Declaration p _) -> p) r.properties
+  fmap (\(p :. _) -> p) r.properties
 
 
 lookupRule :: ClassName -> [Rule] -> Maybe Rule

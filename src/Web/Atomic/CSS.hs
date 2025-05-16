@@ -14,7 +14,6 @@ module Web.Atomic.CSS
   , pointer
   ) where
 
-import Data.Text (Text)
 import Web.Atomic.CSS.Box
 import Web.Atomic.CSS.Layout
 import Web.Atomic.CSS.Reset
@@ -23,7 +22,7 @@ import Web.Atomic.CSS.Text
 import Web.Atomic.CSS.Transition
 import Web.Atomic.Types
 import Web.Atomic.Types.Style
-import Web.Atomic.Types.Styleable (CSS, Styleable, cls, css, utility, utility', (~))
+import Web.Atomic.Types.Styleable (CSS, Styleable, cls, css, utility, (~))
 
 
 {- | Set the list style of an item
@@ -35,13 +34,13 @@ import Web.Atomic.Types.Styleable (CSS, Styleable, cls, css, utility, utility', 
 -}
 list :: (ToClassName l, PropertyStyle ListType l, Styleable h) => l -> CSS h -> CSS h
 list a =
-  utility ("list" -. a) "list-style-type" (propertyStyle @ListType a)
+  utility ("list" -. a) ["list-style-type" :. propertyStyle @ListType a]
 
 
 data ListType
   = Decimal
   | Disc
-  deriving (Show, ToClassName, ToStyleValue)
+  deriving (Show, ToClassName, ToStyle)
 instance PropertyStyle ListType ListType
 instance PropertyStyle ListType None
 
@@ -57,4 +56,4 @@ Button-like elements:
 >   el btn "Sign Up"
 -}
 pointer :: (Styleable h) => CSS h -> CSS h
-pointer = utility @Text "pointer" "cursor" "pointer"
+pointer = utility "pointer" ["cursor" :. "pointer"]

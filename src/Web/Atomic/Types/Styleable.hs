@@ -6,13 +6,12 @@ import Web.Atomic.Types.Selector
 import Web.Atomic.Types.Style
 
 
-
 class Styleable h where
   (~) :: h -> (CSS h -> CSS h) -> h
   h ~ f =
     flip modCSS h $ \rs ->
       let CSS new = f $ CSS rs
-      in uniqueRules new
+       in uniqueRules new
 
 
   modCSS :: ([Rule] -> [Rule]) -> h -> h
@@ -66,11 +65,10 @@ css cn sel ds (CSS rs) =
   CSS $ Rule cn (CustomRule sel) mempty ds : rs
 
 
-utility :: (ToStyleValue s, Styleable h) => ClassName -> Property -> s -> CSS h -> CSS h
-utility cn pn a =
-  utility' cn [Declaration pn (toStyleValue a)]
-
-
-utility' :: (Styleable h) => ClassName -> [Declaration] -> CSS h -> CSS h
-utility' cn ds (CSS rs) =
+utility :: (Styleable h) => ClassName -> [Declaration] -> CSS h -> CSS h
+utility cn ds (CSS rs) =
   CSS $ rule cn ds : rs
+
+
+test :: (Styleable h) => Int -> CSS h -> CSS h
+test n = utility "woot" ["key" :. style n]

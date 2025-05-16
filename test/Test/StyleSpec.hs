@@ -21,7 +21,7 @@ mainSpec = do
       [c] <- pure rs
       ruleClassName c `shouldBe` ClassName "list-decimal"
       ruleSelector c `shouldBe` ".list-decimal"
-      c.properties `shouldBe` [Declaration "list-style-type" "decimal"]
+      c.properties `shouldBe` ["list-style-type" :. "decimal"]
 
     it "should work with outside member None" $ do
       let rs = runCSS @[Rule] $ list None
@@ -29,29 +29,29 @@ mainSpec = do
       [c] <- pure rs
       ruleClassName c `shouldBe` ClassName "list-none"
       ruleSelector c `shouldBe` ".list-none"
-      c.properties `shouldBe` [Declaration "list-style-type" "none"]
+      c.properties `shouldBe` ["list-style-type" :. "none"]
 
   describe "PxRem" $ do
     it "uses absolutes for 0,1" $ do
-      toStyleValue (PxRem 0) `shouldBe` "0px"
-      toStyleValue (PxRem 16) `shouldBe` "1.000rem"
+      style (PxRem 0) `shouldBe` "0px"
+      style (PxRem 16) `shouldBe` "1.000rem"
 
     it "uses rem for others" $ do
-      toStyleValue (PxRem 2) `shouldBe` "0.125rem"
-      toStyleValue (PxRem 10) `shouldBe` "0.625rem"
-      toStyleValue (PxRem 16) `shouldBe` "1.000rem"
+      style (PxRem 2) `shouldBe` "0.125rem"
+      style (PxRem 10) `shouldBe` "0.625rem"
+      style (PxRem 16) `shouldBe` "1.000rem"
 
   describe "Length" $ do
     it "styles pct" $ do
-      toStyleValue (Pct (1 / 3)) `shouldBe` "33.3%"
+      style (Pct (1 / 3)) `shouldBe` "33.3%"
 
     it "adds values" $ do
-      toStyleValue (PxRem 6 + PxRem 10) `shouldBe` "1.000rem"
+      style (PxRem 6 + PxRem 10) `shouldBe` "1.000rem"
 
   describe "Align" $ do
     it "should produce correct style values" $ do
-      toStyleValue AlignCenter `shouldBe` "center"
-      toStyleValue AlignJustify `shouldBe` "justify"
+      style AlignCenter `shouldBe` "center"
+      style AlignJustify `shouldBe` "justify"
 
   describe "ToClassName" $ do
     it "should hyphenate classnames" $ do
@@ -65,10 +65,10 @@ mainSpec = do
 
   describe "Colors" $ do
     it "correct styleValue independent of leading slash" $ do
-      toStyleValue (HexColor "#FFF") `shouldBe` StyleValue "#FFF"
-      toStyleValue (HexColor "FFF") `shouldBe` StyleValue "#FFF"
-      toStyleValue ("FFF" :: HexColor) `shouldBe` StyleValue "#FFF"
-      toStyleValue ("#FFF" :: HexColor) `shouldBe` StyleValue "#FFF"
+      style (HexColor "#FFF") `shouldBe` Style "#FFF"
+      style (HexColor "FFF") `shouldBe` Style "#FFF"
+      style ("FFF" :: HexColor) `shouldBe` Style "#FFF"
+      style ("#FFF" :: HexColor) `shouldBe` Style "#FFF"
 
     it "correct className independent of leading slash" $ do
       toClassName (HexColor "#FFF") `shouldBe` "fff"
@@ -77,8 +77,8 @@ mainSpec = do
       toClassName ("#FFF" :: HexColor) `shouldBe` "fff"
 
     it "works with custom colors" $ do
-      toStyleValue (colorValue Danger) `shouldBe` StyleValue "#F00"
-      toStyleValue (colorValue Warning) `shouldBe` StyleValue "#FF0"
+      style (colorValue Danger) `shouldBe` Style "#F00"
+      style (colorValue Warning) `shouldBe` Style "#FF0"
 
   describe "Styleable" $ do
     it "applies styles" $ do

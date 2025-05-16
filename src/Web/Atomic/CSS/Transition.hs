@@ -18,13 +18,13 @@ transition ms = \case
   (BgColor c) -> trans "background-color" c
   (Color c) -> trans "color" c
  where
-  trans :: (ToClassName val, ToStyleValue val, Styleable h) => Text -> val -> CSS h -> CSS h
+  trans :: (ToClassName val, ToStyle val, Styleable h) => Text -> val -> CSS h -> CSS h
   trans p val =
-    utility'
+    utility
       ("t" -. val -. p -. ms)
-      [ prop "transition-duration" ms
-      , prop "transition-property" p
-      , prop (Property p) val
+      [ "transition-duration" :. style ms
+      , "transition-property" :. style p
+      , (Property p) :. style val
       ]
 
 

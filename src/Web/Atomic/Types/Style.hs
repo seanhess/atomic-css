@@ -14,42 +14,42 @@ newtype Property = Property Text
   deriving newtype (Show, Eq, Ord, IsString)
 
 
-data Declaration = Declaration Property StyleValue
+data Declaration = Property :. Style
   deriving (Show, Ord, Eq)
 
 
-newtype StyleValue = StyleValue String
+newtype Style = Style String
   deriving newtype (IsString, Show, Eq, Monoid, Semigroup, Ord)
 
 
 -- | Convert a type to a css style property value
-class ToStyleValue a where
-  toStyleValue :: a -> StyleValue
-  default toStyleValue :: (Show a) => a -> StyleValue
-  toStyleValue = StyleValue . kebab . show
+class ToStyle a where
+  style :: a -> Style
+  default style :: (Show a) => a -> Style
+  style = Style . kebab . show
 
 
-instance ToStyleValue String where
-  toStyleValue = StyleValue
-instance ToStyleValue Text where
-  toStyleValue = StyleValue . unpack
-instance ToStyleValue Int
-instance ToStyleValue Float where
+instance ToStyle String where
+  style = Style
+instance ToStyle Text where
+  style = Style . unpack
+instance ToStyle Int
+instance ToStyle Float where
   -- this does not convert to a percent, just a ratio
-  toStyleValue n = StyleValue $ showFFloat (Just 2) n ""
-instance ToStyleValue StyleValue where
-  toStyleValue = id
+  style n = Style $ showFFloat (Just 2) n ""
+instance ToStyle Style where
+  style = id
 
 
 -- uniquely set the style value based on the property in question
 class PropertyStyle property value where
-  propertyStyle :: value -> StyleValue
-  default propertyStyle :: (ToStyleValue value) => value -> StyleValue
-  propertyStyle = toStyleValue
+  propertyStyle :: value -> Style
+  default propertyStyle :: (ToStyle value) => value -> Style
+  propertyStyle = style
 
 
 data None = None
-  deriving (Show, ToClassName, ToStyleValue)
+  deriving (Show, ToClassName, ToStyle)
 
 
 -- -- | Convert a type to a prop name
@@ -97,15 +97,15 @@ instance Num Length where
   fromInteger n = PxRem (fromInteger n)
 
 
-instance ToStyleValue PxRem where
-  toStyleValue (PxRem' 0) = "0px"
-  toStyleValue (PxRem' 1) = "1px"
-  toStyleValue (PxRem' n) = StyleValue $ showFFloat (Just 3) ((fromIntegral n :: Float) / 16.0) "" <> "rem"
+instance ToStyle PxRem where
+  style (PxRem' 0) = "0px"
+  style (PxRem' 1) = "1px"
+  style (PxRem' n) = Style $ showFFloat (Just 3) ((fromIntegral n :: Float) / 16.0) "" <> "rem"
 
 
-instance ToStyleValue Length where
-  toStyleValue (PxRem p) = toStyleValue p
-  toStyleValue (Pct n) = StyleValue $ showFFloat (Just 1) (n * 100) "" <> "%"
+instance ToStyle Length where
+  style (PxRem p) = style p
+  style (Pct n) = Style $ showFFloat (Just 1) (n * 100) "" <> "%"
 
 
 -- | Milliseconds, used for transitions
@@ -114,17 +114,17 @@ newtype Ms = Ms Int
   deriving newtype (Num, ToClassName)
 
 
-instance ToStyleValue Ms where
-  toStyleValue (Ms n) = StyleValue $ show n <> "ms"
+instance ToStyle Ms where
+  style (Ms n) = Style $ show n <> "ms"
 
 
 data Wrap
   = Wrap
   | NoWrap
   deriving (Show, ToClassName)
-instance ToStyleValue Wrap where
-  toStyleValue Wrap = "wrap"
-  toStyleValue NoWrap = "nowrap"
+instance ToStyle Wrap where
+  style Wrap = "wrap"
+  style NoWrap = "nowrap"
 
 
 {- | Options for styles that support specifying various sides. This has a "fake" Num instance to support literals
@@ -194,8 +194,8 @@ instance ToColor HexColor where
   colorName (HexColor a) = T.dropWhile (== '#') a
 
 
-instance ToStyleValue HexColor where
-  toStyleValue (HexColor s) = StyleValue $ "#" <> unpack (T.dropWhile (== '#') s)
+instance ToStyle HexColor where
+  style (HexColor s) = Style $ "#" <> unpack (T.dropWhile (== '#') s)
 
 
 instance IsString HexColor where
@@ -205,7 +205,6 @@ instance IsString HexColor where
 instance ToClassName HexColor where
   toClassName = className . colorName
 
-
-prop :: (ToStyleValue a) => Property -> a -> Declaration
-prop cn v =
-  Declaration cn (toStyleValue v)
+-- (.:) :: (ToStyle a) => Property -> Style -> Declaration
+-- cn .: v =
+--   Declaration cn (toStyleValue v)

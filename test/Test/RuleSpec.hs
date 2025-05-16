@@ -59,10 +59,10 @@ spec = do
 
   describe "selector" $ do
     it "creates selector from class name" $ do
-      ruleSelector (Rule.fromClass "pad-10") `shouldBe` ".pad-10"
+      ruleSelector (Rule.fromClass "p-10") `shouldBe` ".p-10"
 
     it "adds pseudo" $ do
-      ruleSelector (addPseudo "hover" "pad-10") `shouldBe` ".hover\\:pad-10:hover"
+      ruleSelector (addPseudo "hover" "p-10") `shouldBe` ".hover\\:p-10:hover"
 
     it "adds media" $ do
       ruleSelector (addMedia (MinWidth 100) "hello") `shouldBe` ".mmnw100\\:hello"
@@ -102,8 +102,8 @@ spec = do
   -- it "doesn't change with custom selectors" $ do
   --   ruleSelector (Rule "hello" (Just ".hello") [Hover] [MinWidth 100] []) `shouldBe` ".hello"
 
-  fs12 = Rule "fs-12" mempty mempty [Declaration "font-size" "12px"]
-  fs24 = Rule "fs-24" mempty mempty [Declaration "font-size" "24px"]
-  bold = Rule "bold" mempty mempty [Declaration "font-weight" "bold"]
-  normal = Rule "normal" mempty mempty [Declaration "font-weight" "normal"]
-  custom = Rule "custom" (CustomRule ".custom > *") mempty [Declaration "font-weight" "bold"]
+  fs12 = Rule "fs-12" mempty mempty ["font-size" :. "12px"]
+  fs24 = Rule "fs-24" mempty mempty ["font-size" :. "24px"]
+  bold = Rule "bold" mempty mempty ["font-weight" :. "bold"]
+  normal = Rule "normal" mempty mempty ["font-weight" :. "normal"]
+  custom = Rule "custom" (CustomRule ".custom > *") mempty ["font-weight" :. "bold"]

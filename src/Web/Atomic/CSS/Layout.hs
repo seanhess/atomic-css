@@ -5,7 +5,6 @@
 
 module Web.Atomic.CSS.Layout where
 
-import Data.Text
 import Web.Atomic.Types
 
 
@@ -36,14 +35,14 @@ holygrail = 'layout' id $ do
 -}
 fillViewport :: (Styleable h) => CSS h -> CSS h
 fillViewport =
-  utility'
+  utility
     "fill-viewport"
     -- [ ("white-space", "pre")
-    [ prop @Text "width" "100vw"
-    , prop @Text "height" "100vh"
+    [ "width" :. "100vw"
+    , "height" :. "100vh"
     , -- not sure if this property is necessary, copied from older code
-      prop @Text "min-height" "100vh"
-    , prop @Text "z-index" "0"
+      "min-height" :. "100vh"
+    , "z-index" :. "0"
     ]
 
 
@@ -56,10 +55,10 @@ fillViewport =
 -}
 flexRow :: (Styleable h) => CSS h -> CSS h
 flexRow =
-  utility'
+  utility
     "row"
-    [ Declaration "display" "flex"
-    , Declaration "flex-direction" (toStyleValue Row)
+    [ "display" :. "flex"
+    , "flex-direction" :. style Row
     ]
 
 
@@ -72,10 +71,10 @@ flexRow =
 -}
 flexCol :: (Styleable h) => CSS h -> CSS h
 flexCol =
-  utility'
+  utility
     "col"
-    [ Declaration "display" "flex"
-    , Declaration "flex-direction" (toStyleValue Column)
+    [ "display" :. "flex"
+    , "flex-direction" :. style Column
     ]
 
 
@@ -86,7 +85,7 @@ flexCol =
 >  el_ "Right"
 -}
 grow :: (Styleable h) => CSS h -> CSS h
-grow = utility @Int "grow" "flex-grow" 1
+grow = utility "grow" ["flex-grow" :. "1"]
 
 
 {- | Space that fills the available space in the parent 'Web.View.Layout.row' or 'Web.View.Layout.col'.
@@ -111,7 +110,7 @@ This is equivalent to an empty element with 'grow'
 >   col (grow . scroll) "Main Content"
 -}
 scroll :: (Styleable h) => CSS h -> CSS h
-scroll = utility @Text "scroll" "overflow" "auto"
+scroll = utility "scroll" ["overflow" :. "auto"]
 
 
 {- | A Nav element
@@ -130,19 +129,19 @@ stack =
   container . absChildren
  where
   container =
-    utility'
+    utility
       "stack"
-      [ prop @Text "position" "relative"
-      , prop @Text "display" "grid"
-      , prop @Text "overflow" "visible"
+      [ "position" :. "relative"
+      , "display" :. "grid"
+      , "overflow" :. "visible"
       ]
 
   absChildren =
     css
       "stack-child"
       ".stack-child > *"
-      [ prop @Text "grid-area" "1 / 1"
-      , prop @Text "min-height" "fit-content"
+      [ "grid-area" :. "1 / 1"
+      , "min-height" :. "fit-content"
       ]
 
 
@@ -182,19 +181,19 @@ inset sides = off sides
 
 
 top :: (Styleable h) => Length -> CSS h -> CSS h
-top l = utility ("top" -. l) "top" l
+top l = utility ("top" -. l) ["top" :. style l]
 
 
 bottom :: (Styleable h) => Length -> CSS h -> CSS h
-bottom l = utility ("bottom" -. l) "bottom" l
+bottom l = utility ("bottom" -. l) ["bottom" :. style l]
 
 
 right :: (Styleable h) => Length -> CSS h -> CSS h
-right l = utility ("right" -. l) "right" l
+right l = utility ("right" -. l) ["right" :. style l]
 
 
 left :: (Styleable h) => Length -> CSS h -> CSS h
-left l = utility ("left" -. l) "left" l
+left l = utility ("left" -. l) ["left" :. style l]
 
 
 -- | Hide an element. See 'display'
@@ -205,19 +204,19 @@ hide = display None
 data FlexDirection
   = Row
   | Column
-  deriving (Show, ToStyleValue)
+  deriving (Show, ToStyle)
 instance ToClassName FlexDirection where
   toClassName Row = "row"
   toClassName Column = "col"
 
 
 flexDirection :: (Styleable h) => FlexDirection -> CSS h -> CSS h
-flexDirection dir = utility (toClassName dir) "flex-direction" dir
+flexDirection dir = utility (toClassName dir) ["flex-direction" :. style dir]
 
 
 data FlexWrap
   = WrapReverse
-  deriving (Show, ToStyleValue)
+  deriving (Show, ToStyle)
 instance PropertyStyle FlexWrap FlexWrap
 instance PropertyStyle FlexWrap Wrap
 instance ToClassName FlexWrap where
@@ -226,12 +225,12 @@ instance ToClassName FlexWrap where
 
 flexWrap :: (PropertyStyle FlexWrap w, ToClassName w, Styleable h) => w -> CSS h -> CSS h
 flexWrap w =
-  utility ("fwrap" -. w) "flex-wrap" (propertyStyle @FlexWrap w)
+  utility ("fwrap" -. w) ["flex-wrap" :. propertyStyle @FlexWrap w]
 
 
 -- | position:absolute, relative, etc. See 'Web.View.Layout.stack' and 'Web.View.Layout.popup'
 position :: (Styleable h) => Position -> CSS h -> CSS h
-position p = utility ("pos" -. p) "position" p
+position p = utility ("pos" -. p) ["position" :. style p]
 
 
 data Position
@@ -239,11 +238,11 @@ data Position
   | Fixed
   | Sticky
   | Relative
-  deriving (Show, ToClassName, ToStyleValue)
+  deriving (Show, ToClassName, ToStyle)
 
 
 zIndex :: (Styleable h) => Int -> CSS h -> CSS h
-zIndex n = utility ("z" -. n) "z-index" n
+zIndex n = utility ("z" -. n) ["z-index" :. style n]
 
 
 {- | Set container display
@@ -252,23 +251,23 @@ el (display None) "HIDDEN"
 -}
 display :: (PropertyStyle Display d, ToClassName d, Styleable h) => d -> CSS h -> CSS h
 display disp =
-  utility ("disp" -. disp) "display" (propertyStyle @Display disp)
+  utility ("disp" -. disp) ["display" :. propertyStyle @Display disp]
 
 
 data Display
   = Block
   | Flex
-  deriving (Show, ToClassName, ToStyleValue)
+  deriving (Show, ToClassName, ToStyle)
 instance PropertyStyle Display Display
 instance PropertyStyle Display None
 
 
 hidden :: (Styleable h) => CSS h -> CSS h
-hidden = utility' "hidden" [Declaration "visibility" "hidden"]
+hidden = utility "hidden" ["visibility" :. "hidden"]
 
 
 visible :: (Styleable h) => CSS h -> CSS h
-visible = utility' "hidden" [Declaration "visibility" "visible"]
+visible = utility "hidden" ["visibility" :. "visible"]
 
 
 -- what if you set flex-shrink later?
@@ -278,30 +277,30 @@ visible = utility' "hidden" [Declaration "visibility" "visible"]
 -- | Set to a specific width
 width :: (Styleable h) => Length -> CSS h -> CSS h
 width n =
-  utility'
+  utility
     ("w" -. n)
-    [ prop "width" n
-    , prop @Int "flex-shrink" 0
+    [ "width" :. style n
+    , "flex-shrink" :. "0"
     ]
 
 
 -- | Set to a specific height
 height :: (Styleable h) => Length -> CSS h -> CSS h
 height n =
-  utility'
+  utility
     ("h" -. n)
-    [ prop "height" n
-    , prop @Int "flex-shrink" 0
+    [ "height" :. style n
+    , "flex-shrink" :. "0"
     ]
 
 
 -- | Allow width to grow to contents but not shrink any smaller than value
 minWidth :: (Styleable h) => Length -> CSS h -> CSS h
 minWidth n =
-  utility ("mw" -. n) "min-width" n
+  utility ("mw" -. n) ["min-width" :. style n]
 
 
 -- | Allow height to grow to contents but not shrink any smaller than value
 minHeight :: (Styleable h) => Length -> CSS h -> CSS h
 minHeight n =
-  utility ("mh" -. n) "min-height" n
+  utility ("mh" -. n) ["min-height" :. style n]

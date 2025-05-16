@@ -131,10 +131,10 @@ cssRuleLine r =
    in Just $ Line Newline 0 $ wrapMedia med $ sel <> " { " <> props <> " }"
  where
   renderProp :: Declaration -> Text
-  renderProp (Declaration (Property p) cv) = p <> ":" <> renderStyle cv
+  renderProp ((Property p) :. cv) = p <> ":" <> renderStyle cv
 
-  renderStyle :: StyleValue -> Text
-  renderStyle (StyleValue v) = pack v
+  renderStyle :: Style -> Text
+  renderStyle (Style v) = pack v
 
 
 wrapMedia :: MediaQuery -> Text -> Text

@@ -38,7 +38,7 @@ mediaSpec = do
     mediaCriteria (MinWidth 100) `shouldBe` "min-width: 100px"
 
   it "renders media query" $ do
-    cssRuleLine (addMedia (MinWidth 100) $ rule "bold" [Declaration "font-weight" "bold"]) `shouldBe` Just "@media (min-width: 100px) { .mmnw100\\:bold { font-weight:bold } }"
+    cssRuleLine (addMedia (MinWidth 100) $ rule "bold" ["font-weight" :. "bold"]) `shouldBe` Just "@media (min-width: 100px) { .mmnw100\\:bold { font-weight:bold } }"
 
 
 pseudoSpec :: Spec
@@ -56,27 +56,27 @@ pseudoSpec = do
 ruleSpec :: Spec
 ruleSpec = do
   it "renders rules" $ do
-    let r1 = rule "hello" [Declaration "key" "value"]
+    let r1 = rule "hello" ["key" :. "value"]
     cssRuleLine r1 `shouldBe` Just ".hello { key:value }"
 
-    let r2 = rule "has2" [Declaration "k1" "val", Declaration "k2" "val"]
+    let r2 = rule "has2" ["k1" :. "val", "k2" :. "val"]
     cssRuleLine r2 `shouldBe` Just ".has2 { k1:val; k2:val }"
 
   it "no render empty rules" $ do
     cssRuleLine (Rule.fromClass "hello") `shouldBe` Nothing
 
   it "renders media" $ do
-    let r = addMedia (MinWidth 100) $ rule "hello" [Declaration "key" "value"]
+    let r = addMedia (MinWidth 100) $ rule "hello" ["key" :. "value"]
     ruleClassName r `shouldBe` "mmnw100:hello"
     ruleSelector r `shouldBe` ".mmnw100\\:hello"
     cssRuleLine r `shouldBe` Just "@media (min-width: 100px) { .mmnw100\\:hello { key:value } }"
 
   it "renders pseudo" $ do
-    let r = addPseudo "hover" $ rule "hello" [Declaration "key" "value"]
+    let r = addPseudo "hover" $ rule "hello" ["key" :. "value"]
     cssRuleLine r `shouldBe` Just ".hover\\:hello:hover { key:value }"
 
   it "renders pseudo + media" $ do
-    let r = addMedia (MinWidth 100) $ addPseudo "hover" $ rule "hello" [Declaration "key" "value"]
+    let r = addMedia (MinWidth 100) $ addPseudo "hover" $ rule "hello" ["key" :. "value"]
     cssRuleLine r `shouldBe` Just "@media (min-width: 100px) { .mmnw100\\:hover\\:hello:hover { key:value } }"
 
 
@@ -226,16 +226,16 @@ htmlSpec = do
 
   describe "classes" $ do
     it "should add utility classes" $ do
-      htmlLines 0 (tag "div" ~ bold . pad 10 $ none) `shouldBe` ["<div class='bold pad-10'></div>"]
+      htmlLines 0 (tag "div" ~ bold . pad 10 $ none) `shouldBe` ["<div class='bold p-10'></div>"]
 
     it "should override in composition order" $ do
-      htmlLines 0 (tag "div" ~ pad 10 . pad 5 $ none) `shouldBe` ["<div class='pad-10'></div>"]
+      htmlLines 0 (tag "div" ~ pad 10 . pad 5 $ none) `shouldBe` ["<div class='p-10'></div>"]
 
     it "should override in styleable order" $ do
-      htmlLines 0 (tag "div" ~ pad 10 ~ pad 5 $ none) `shouldBe` ["<div class='pad-5'></div>"]
+      htmlLines 0 (tag "div" ~ pad 10 ~ pad 5 $ none) `shouldBe` ["<div class='p-5'></div>"]
 
     it "merges class attribute if set" $ do
-      htmlLines 0 (tag "div" @ att "class" "hello" ~ bold . pad 5 $ none) `shouldBe` ["<div class='bold pad-5 hello'></div>"]
+      htmlLines 0 (tag "div" @ att "class" "hello" ~ bold . pad 5 $ none) `shouldBe` ["<div class='bold p-5 hello'></div>"]
  where
   inline :: Text -> Html () -> Html ()
   inline nm (Html _ content) = do
