@@ -139,15 +139,6 @@ ruleSelectorF rs =
     GeneratedRule _ f -> f
 
 
--- where
---  pseudos = mconcat . fmap pseudoSuffix
-
--- rulePseudo :: Rule -> [Pseudo]
--- rulePseudo r =
---   case r.selector of
---     CustomRule _ -> []
---     FromClass ps _ -> ps
-
 ruleCustomSelector :: Rule -> Maybe Selector
 ruleCustomSelector r =
   case r.selector of

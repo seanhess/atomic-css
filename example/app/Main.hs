@@ -151,7 +151,7 @@ tooltips = do
     css
       "tooltips"
       ".tooltips:hover > .tooltip"
-      [Declaration "visibility" "visible"]
+      (declarations hidden)
 
   red = HexColor "#F00"
 
@@ -224,8 +224,8 @@ texts = col ~ gap 10 . pad 20 $ do
   -- el ~ bg Error . bg Warning ~ if True then bold else id $ "Warning"
 
   el ~ pad 10 $ do
-    el ~ descendentOf "htmx-request" flexRow . hide $ "Loading..."
-    el ~ descendentOf "htmx-request" hide . flexRow $ "Normal Content"
+    el ~ descendentOf "htmx-request" flexRow . display None $ "Loading..."
+    el ~ descendentOf "htmx-request" (display None) . flexRow $ "Normal Content"
 
   el ~ italic $ "Italic Text"
   el ~ underline $ "Underline Text"

@@ -44,12 +44,6 @@ newtype CSS h = CSS {rules :: [Rule]}
   deriving newtype (Monoid, Semigroup)
 
 
-runCSS :: (CSS h -> CSS h) -> [Rule]
-runCSS f =
-  let CSS rs = f mempty
-   in rs
-
-
 mapRules :: (Rule -> Rule) -> CSS a -> CSS a
 mapRules f (CSS rs) = CSS $ fmap f rs
 
@@ -70,5 +64,14 @@ utility cn ds (CSS rs) =
   CSS $ rule cn ds : rs
 
 
-test :: (Styleable h) => Int -> CSS h -> CSS h
-test n = utility "woot" ["key" :. style n]
+-- | Get all the rules for combined utilities
+rules :: (CSS [Rule] -> CSS [Rule]) -> [Rule]
+rules f =
+  let CSS rs = f mempty
+   in rs
+
+
+-- | Get all the declarations for a utility or combination of them
+declarations :: (CSS [Rule] -> CSS [Rule]) -> [Declaration]
+declarations f =
+  mconcat $ fmap (.properties) (rules f)

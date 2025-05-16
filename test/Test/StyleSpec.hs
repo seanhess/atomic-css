@@ -16,7 +16,7 @@ mainSpec :: Spec
 mainSpec = do
   describe "PropertyStyle" $ do
     it "should compile, and set both the className and styles" $ do
-      let rs = runCSS @[Rule] $ list Decimal
+      let rs = rules $ list Decimal
       length rs `shouldBe` 1
       [c] <- pure rs
       ruleClassName c `shouldBe` ClassName "list-decimal"
@@ -24,7 +24,7 @@ mainSpec = do
       c.properties `shouldBe` ["list-style-type" :. "decimal"]
 
     it "should work with outside member None" $ do
-      let rs = runCSS @[Rule] $ list None
+      let rs = rules $ list None
       length rs `shouldBe` 1
       [c] <- pure rs
       ruleClassName c `shouldBe` ClassName "list-none"

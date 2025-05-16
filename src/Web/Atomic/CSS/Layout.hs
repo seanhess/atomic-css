@@ -196,11 +196,6 @@ left :: (Styleable h) => Length -> CSS h -> CSS h
 left l = utility ("left" -. l) ["left" :. style l]
 
 
--- | Hide an element. See 'display'
-hide :: (Styleable h) => CSS h -> CSS h
-hide = display None
-
-
 data FlexDirection
   = Row
   | Column
@@ -269,10 +264,6 @@ hidden = utility "hidden" ["visibility" :. "hidden"]
 visible :: (Styleable h) => CSS h -> CSS h
 visible = utility "hidden" ["visibility" :. "visible"]
 
-
--- what if you set flex-shrink later?
--- it has undefined behavior
---
 
 -- | Set to a specific width
 width :: (Styleable h) => Length -> CSS h -> CSS h
