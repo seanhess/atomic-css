@@ -15,11 +15,16 @@ newtype Attributes h = Attributes (Map Name AttValue)
 
 -- | Add Atts
 class Attributable h where
+  -- | Apply an attribute to some html
+  --
+  -- > el @ att "id" "main-content" $ do
+  -- >   tag "img" @ att "src" "logo.png"
+  -- >   tag "input" @ placeholder "message" ~ border 1
   (@) :: h -> (Attributes h -> Attributes h) -> h
   h @ f =
     flip modAttributes h $ \m ->
       let Attributes atts = f $ Attributes m
-      in atts
+       in atts
 
 
   modAttributes :: (Map Name AttValue -> Map Name AttValue) -> h -> h
@@ -36,12 +41,12 @@ instance {-# OVERLAPPABLE #-} (Attributable a, Attributable b) => Attributable (
        in Attributes m2
 
 
-  modAttributes f hh = \content ->
+  modAttributes f hh content =
     modAttributes f $ hh content
 
 
 instance Attributable (Map Name AttValue) where
-  modAttributes f m = f m
+  modAttributes f = f
 
 
 instance Attributable (Attributes h) where

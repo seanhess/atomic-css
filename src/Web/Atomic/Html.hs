@@ -11,16 +11,25 @@ import GHC.Exts (IsList (..))
 import Web.Atomic.Types
 
 
--- | A single HTML tag. Note that the class attribute is generated separately from the css, rather than the attributes
-data Element = Element
-  { inline :: Bool
-  , name :: Text
-  , css :: [Rule]
-  , attributes :: Map Name AttValue
-  , content :: [Node]
-  }
+{- | Html monad
 
+@
+import Web.Atomic
 
+example = 'el' ~ flexCol . pad 10 $ do
+  el ~ fontSize 24 . bold $ "My Page"
+  el "one"
+  el "two"
+  el "three"
+  button @ onClick "alert('hi')" ~ border 1 $ "Click Me"
+
+button = 'tag' "button"
+
+placeholder = 'att' "placeholder"
+autofocus = 'att' "autofocus" ""
+onClick = 'att' "onclick"
+@
+-}
 data Html a = Html {value :: a, nodes :: [Node]}
 
 
@@ -53,6 +62,37 @@ instance Monad Html where
      in Html b (nas <> nbs)
 
 
+el :: Html () -> Html ()
+el = tag "div"
+
+
+tag :: Text -> Html () -> Html ()
+tag nm (Html _ content) = do
+  Html () [Elem $ (element nm){content}]
+
+
+text :: Text -> Html ()
+text t = Html () [Text t]
+
+
+none :: Html ()
+none = pure ()
+
+
+raw :: Text -> Html ()
+raw t = Html () [Raw t]
+
+
+-- | A single 'Html' element. Note that the class attribute is generated separately from the css rules, rather than the attributes
+data Element = Element
+  { inline :: Bool
+  , name :: Text
+  , css :: [Rule]
+  , attributes :: Map Name AttValue
+  , content :: [Node]
+  }
+
+
 data Node
   = Elem Element
   | Text Text
@@ -79,23 +119,6 @@ element nm = Element False nm mempty mempty mempty
 instance Attributable (Html a) where
   modAttributes f =
     mapElement (\elm -> elm{attributes = f elm.attributes})
-
-
-tag :: Text -> Html () -> Html ()
-tag nm (Html _ content) = do
-  Html () [Elem $ (element nm){content}]
-
-
-text :: Text -> Html ()
-text t = Html () [Text t]
-
-
-none :: Html ()
-none = pure ()
-
-
-raw :: Text -> Html ()
-raw t = Html () [Raw t]
 
 
 instance Styleable (Html a) where

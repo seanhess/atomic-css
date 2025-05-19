@@ -26,10 +26,6 @@ row :: Html () -> Html ()
 row = tag "div" ~ flexRow
 
 
-el :: Html () -> Html ()
-el = tag "div"
-
-
 space :: Html ()
 space = tag "div" ~ grow $ none
 

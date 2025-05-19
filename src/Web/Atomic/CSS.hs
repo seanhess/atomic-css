@@ -1,5 +1,5 @@
 {- |
-Module:      Web.Atomic
+Module:      Web.Atomic.CSS
 Copyright:   (c) 2023 Sean Hess
 License:     BSD3
 Maintainer:  Sean Hess <seanhess@gmail.com>
@@ -8,12 +8,14 @@ Portability: portable
 
 Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
 
-> import Web.Atomic
->
-> example :: Html ()
-> example = col ~ gap 10 $ do
->  el ~ bold . fontSize 32 $ "My page"
->  button ~ border 1 $ "Click Me"
+@
+import Web.Atomic
+
+example :: 'Html' ()
+example = 'el' ~ 'flexCol' . 'gap' 10 $ do
+ 'el' ~ 'bold' . 'fontSize' 32 $ "My page"
+ 'el' ~ 'border' 1 $ "Hello!"
+@
 
 See [Web.Atomic](Web-Atomic.html) for a complete introduction
 -}

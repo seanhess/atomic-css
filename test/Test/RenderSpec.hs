@@ -275,10 +275,6 @@ htmlSpec = do
 row :: Html () -> Html ()
 row = el ~ flexCol
 
-
-el :: Html () -> Html ()
-el = tag "div"
-
 -- it "psuedo + parent" $ do
 --   let sel = (selector "myclass"){ancestor = Just "parent", pseudo = Just Hover}
 --   selectorText sel `shouldBe` ".parent .hover\\:parent-myclass:hover"

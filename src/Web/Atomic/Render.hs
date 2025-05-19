@@ -25,12 +25,6 @@ renderLazyByteString :: Html () -> BL.ByteString
 renderLazyByteString = TLE.encodeUtf8 . renderLazyText
 
 
-{- | Renders a 'View' as HTML with embedded CSS class definitions
-
->>> renderText $ el bold "Hello"
-<style type='text/css'>.bold { font-weight:bold }</style>
-<div class='bold'>Hello</div>
--}
 renderText :: Html () -> Text
 renderText html =
   let cs = cssRulesLines $ htmlCSSRules html
@@ -95,7 +89,8 @@ newtype FlatAttributes = FlatAttributes (Map Name AttValue)
 elementAttributes :: Element -> FlatAttributes
 elementAttributes e =
   FlatAttributes $
-    addClasses (styleClass e) $
+    addClasses
+      (styleClass e)
       e.attributes
  where
   addClasses :: AttValue -> Map Name AttValue -> Map Name AttValue
@@ -128,7 +123,7 @@ cssRuleLine r | null r.properties = Nothing
 cssRuleLine r =
   let sel = (ruleSelector r).text
       props = intercalate "; " (map renderProp r.properties)
-      med = mconcat $ fmap mediaCriteria $ r.media
+      med = mconcat $ fmap mediaCriteria r.media
    in Just $ Line Newline 0 $ wrapMedia med $ sel <> " { " <> props <> " }"
  where
   renderProp :: Declaration -> Text
