@@ -5,9 +5,9 @@ cabal-version: 2.2
 -- see: https://github.com/sol/hpack
 
 name:           atomic-css
-version:        0.8.0
-synopsis:       Type-safe HTML and CSS with intuitive layouts and composable styles.
-description:    Type-safe HTML and CSS with intuitive layouts and composable styles. Inspired by Tailwindcss and Elm-UI . See documentation for the @Web.View@ module below
+version:        0.1.0
+synopsis:       Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
+description:    Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI . See documentation for the @Web.Atomic@ module below
 category:       Web
 homepage:       https://github.com/seanhess/atomic-css
 bug-reports:    https://github.com/seanhess/atomic-css/issues

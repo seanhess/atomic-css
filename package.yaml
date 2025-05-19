@@ -1,6 +1,6 @@
 name:               atomic-css
-version:            0.8.0
-synopsis:           Type-safe HTML and CSS with intuitive layouts and composable styles.
+version:            0.1.0
+synopsis:           Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
 homepage:           https://github.com/seanhess/atomic-css
 github:             seanhess/atomic-css
 license:            BSD-3-Clause
@@ -9,9 +9,9 @@ author:             Sean Hess
 maintainer:         seanhess@gmail.com
 category:           Web
 description:
-  Type-safe HTML and CSS with intuitive layouts and composable styles. Inspired by Tailwindcss and Elm-UI
+  Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
   .
-  See documentation for the @Web.View@ module below
+  See documentation for the @Web.Atomic@ module below
 
 extra-doc-files:
   - README.md

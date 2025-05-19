@@ -85,7 +85,7 @@ newtype FlatAttributes = FlatAttributes (Map Name AttValue)
   deriving newtype (Eq)
 
 
--- | The 'Web.View.Types.Attributes' for an element, inclusive of class.
+-- | The 'FlatAttributes' for an element, inclusive of class.
 elementAttributes :: Element -> FlatAttributes
 elementAttributes e =
   FlatAttributes $

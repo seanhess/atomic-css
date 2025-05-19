@@ -72,7 +72,7 @@ instance PropertyStyle Shadow Inner where
   propertyStyle _ = "inset 0 2px 4px 0 rgb(0 0 0 / 0.05);"
 
 
--- | Set the background color. See 'Web.View.Types.ToColor'
+-- | Set the background color. See 'ToColor'
 bg :: (ToColor clr, Styleable h) => clr -> CSS h -> CSS h
 bg c = utility ("bg" -. colorName c) ["background-color" :. style (colorValue c)]
 
@@ -109,7 +109,7 @@ borderWidth =
   prop p = "border" <> p <> "-width"
 
 
--- | Set a border color. See 'Web.View.Types.ToColor'
+-- | Set a border color. See 'ToColor'
 borderColor :: (ToColor clr, Styleable h) => clr -> CSS h -> CSS h
 borderColor c =
   utility ("brdc" -. colorName c) ["border-color" :. style (colorValue c)]
