@@ -16,18 +16,15 @@ import Web.Atomic.Types
 @
 import Web.Atomic
 
-example = 'el' ~ flexCol . pad 10 $ do
-  el ~ fontSize 24 . bold $ "My Page"
-  el "one"
-  el "two"
-  el "three"
-  button @ onClick "alert('hi')" ~ border 1 $ "Click Me"
+example = do
+  'el' ~ pad 10 $ do
+    'el' ~ fontSize 24 . bold $ "My Links"
+    a '@' href "hoogle.haskell.org" ~ link $ \"Hoogle\"
+    a '@' href "hackage.haskell.org" ~ link $ \"Hackage\"
 
-button = 'tag' "button"
-
-placeholder = 'att' "placeholder"
-autofocus = 'att' "autofocus" ""
-onClick = 'att' "onclick"
+link = underline . color Primary
+a = 'tag' "a"
+href = 'att' "href"
 @
 -}
 data Html a = Html {value :: a, nodes :: [Node]}

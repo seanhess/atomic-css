@@ -35,8 +35,11 @@ import Web.Atomic.Render
 import Web.Atomic.Types
 
 
+-- TODO: update readme
+-- TODO: decide on a tagline / synopsis and put it everywhere
+
 {- $html
-We also provide a useful Html Monad and combinator library (no Html5 tags or attributes are exported)
+We also provide an Html Monad and combinator library with basic functions to generate html and add attributes with the `(@)` operator
 -}
 
 
@@ -62,39 +65,28 @@ See Web.Atomic.CSS for a full list of utilities provided by this library
 Create stylish html using composable haskell functions:
 
 @
-import Web.Atomic
-
-example :: 'Html' ()
-example = 'el' ~ 'flexCol' . 'gap' 10 $ do
- 'el' ~ 'bold' . 'fontSize' 32 $ "My page"
- 'el' ~ 'border' 1 $ "Hello!"
+'el' ~ 'bold' $ "Hello World"
 @
 
 This renders as the following HTML with embedded CSS definitions
 
 > <style type='text/css'>
 > .bold { font-weight:bold }
-> .brd-1 { border:1px; border-style:solid }
-> .col { display:flex; flex-direction:column }
-> .fs-32 { font-size:2.0rem }
-> .gap-10 { gap:0.625rem }
 > </style>
 >
-> <div class='col gap-10'>
->   <div class='bold fs-32'>My page</div>
->   <button class='brd-1'>Click Me</button>
-> </div>
+> <div class='bold'>Hello World</div>
 
-Factor your styles with the full power of Haskell functions, instead of relying on the cascade
+Instead of relying on the fickle cascade, factor and compose styles with the full power of Haskell functions!
 
 > header = bold
 > h1 = header . fontSize 32
 > h2 = header . fontSize 24
-> page = gap 10
+> page = flexCol . gap 10 . pad 10
 >
-> example = col ~ page $ do
+> example = el ~ page $ do
 >   el ~ h1 $ "My Page"
->   el "some content"
+>   el ~ h2 $ "Introduction"
+>   el "lorem ipsum yada yada yada"
 >   ...
 
 This approach is inspired by Tailwindcss' [Utility Classes](https://tailwindcss.com/docs/styling-with-utility-classes)

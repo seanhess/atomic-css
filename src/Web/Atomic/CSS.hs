@@ -6,15 +6,15 @@ Maintainer:  Sean Hess <seanhess@gmail.com>
 Stability:   experimental
 Portability: portable
 
-Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
+Type-safe Atomic CSS with composable css utility classes and intuitive layouts. Inspired by Tailwindcss and Elm-UI
 
 @
 import Web.Atomic
 
-example :: 'Html' ()
-example = 'el' ~ 'flexCol' . 'gap' 10 $ do
- 'el' ~ 'bold' . 'fontSize' 32 $ "My page"
- 'el' ~ 'border' 1 $ "Hello!"
+example = do
+  'el' ~ 'flexCol' . 'gap' 10 $ do
+    'el' ~ 'bold' . 'fontSize' 32 $ "My page"
+    'el' "Hello!"
 @
 
 See [Web.Atomic](Web-Atomic.html) for a complete introduction
