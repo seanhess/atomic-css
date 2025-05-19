@@ -5,7 +5,7 @@ import Web.Atomic.Types
 
 {- | Apply when hovering over an element
 
-> el (bg Primary . hover (bg PrimaryLight)) "Hover"
+> el ~ bg Primary . hover (bg PrimaryLight) $ "Hover"
 -}
 hover :: (Styleable h) => (CSS h -> CSS h) -> CSS h -> CSS h
 hover = pseudo "hover"
@@ -33,7 +33,7 @@ pseudo p f ss =
 
 {- | Apply when the Media matches the current window. This allows for responsive designs
 
-> el (width 100 . media (MinWidth 800) (width 400))
+> el ~ width 100 . media (MinWidth 800) (width 400) $ do
 >   "Big if window > 800"
 -}
 media :: (Styleable h) => Media -> (CSS h -> CSS h) -> CSS h -> CSS h
@@ -53,6 +53,10 @@ addMedia m r =
     }
 
 
+{- | Apply when this element is contained somewhere another element with the given class
+
+> el ~ descendentOf "htmx-request" bold $ "Only bold when htmx is making a request"
+-}
 descendentOf :: (Styleable h) => ClassName -> (CSS h -> CSS h) -> CSS h -> CSS h
 descendentOf c f ss =
   mapRules (addAncestor c) (f mempty) <> ss

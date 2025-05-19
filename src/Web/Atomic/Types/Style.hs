@@ -22,7 +22,16 @@ newtype Style = Style String
   deriving newtype (IsString, Show, Eq, Monoid, Semigroup, Ord)
 
 
--- | Convert a type to a css style property value
+{- | Convert a type to a css style value
+
+@
+data Float = Right | Left
+
+instance ToStyle Float where
+  style Right = "right"
+  style Left = "left"
+@
+-}
 class ToStyle a where
   style :: a -> Style
   default style :: (Show a) => a -> Style
@@ -41,7 +50,24 @@ instance ToStyle Style where
   style = id
 
 
--- uniquely set the style value based on the property in question
+{- | Reuse types that belong to more than one css property
+
+@
+data None = None
+  deriving (Show, ToClassName, ToStyle)
+
+data Display
+  = Block
+  | Flex
+  deriving (Show, ToClassName, ToStyle)
+instance PropertyStyle Display Display
+instance PropertyStyle Display None
+
+display :: (PropertyStyle Display d, ToClassName d, Styleable h) => d -> CSS h -> CSS h
+display disp =
+  utility ("disp" -. disp) ["display" :. propertyStyle @Display disp]
+@
+-}
 class PropertyStyle property value where
   propertyStyle :: value -> Style
   default propertyStyle :: (ToStyle value) => value -> Style
@@ -127,7 +153,7 @@ instance ToStyle Wrap where
   style NoWrap = "nowrap"
 
 
-{- | Options for styles that support specifying various sides. This has a "fake" Num instance to support literals
+{- | Options for styles that support specifying various sides
 
 > border 5
 > border (X 2)
@@ -168,14 +194,14 @@ instance (Num a) => Num (Sides a) where
 >   = White
 >   | Primary
 >   | Dark
+>   deriving (Show)
 >
 > instance ToColor AppColor where
 >   colorValue White = "#FFF"
 >   colorValue Dark = "#333"
 >   colorValue Primary = "#00F"
 >
-> hello :: View c ()
-> hello = el (bg Primary . color White) "Hello"
+> hello = el ~ bg Primary . color White $ "Hello"
 -}
 class ToColor a where
   colorValue :: a -> HexColor
@@ -184,7 +210,7 @@ class ToColor a where
   colorName = T.toLower . pack . show
 
 
--- | Hexidecimal Color. Can be specified with or without the leading '#'. Recommended to use an AppColor type instead of manually using hex colors. See 'Web.Atomic.Types.ToColor'
+-- | Hexidecimal Color. Can be specified with or without the leading '#'. Recommended to use an AppColor type instead of manually using hex colors. See 'ToColor'
 newtype HexColor = HexColor Text
   deriving (Show)
 
@@ -204,7 +230,3 @@ instance IsString HexColor where
 
 instance ToClassName HexColor where
   toClassName = className . colorName
-
--- (.:) :: (ToStyle a) => Property -> Style -> Declaration
--- cn .: v =
---   Declaration cn (toStyleValue v)

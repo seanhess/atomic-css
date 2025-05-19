@@ -8,8 +8,8 @@ import Web.Atomic.Types
 
 {- | Animate changes to the given property
 
-> el (transition 100 (Height 400)) "Tall"
-> el (transition 100 (Height 100)) "Small"
+> el ~ transition 100 (Height 400) $ "Tall"
+> el ~ transition 100 (Height 100) $ "Small"
 -}
 transition :: (Styleable h) => Ms -> TransitionProperty -> CSS h -> CSS h
 transition ms = \case
@@ -24,7 +24,7 @@ transition ms = \case
       ("t" -. val -. p -. ms)
       [ "transition-duration" :. style ms
       , "transition-property" :. style p
-      , (Property p) :. style val
+      , Property p :. style val
       ]
 
 

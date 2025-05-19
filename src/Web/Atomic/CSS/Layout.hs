@@ -1,7 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
 
 module Web.Atomic.CSS.Layout where
 
@@ -14,25 +12,15 @@ import Web.Atomic.Types
 Wrap main content in 'layout' to allow the view to consume vertical screen space
 
 @
-holygrail :: 'View' c ()
-holygrail = 'layout' id $ do
-  'row' section "Top Bar"
-  'row' 'grow' $ do
-    'col' section "Left Sidebar"
-    'col' (section . 'grow') "Main Content"
-    'col' section "Right Sidebar"
-  'row' section "Bottom Bar"
-  where section = 'border' 1
+holygrail = do
+  col ~ fillViewport $ do
+    row "Top Bar"
+    row ~ grow $ do
+      col "Left Sidebar"
+      col ~ grow $ "Main Content"
+      col "Right Sidebar"
+    row "Bottom Bar"
 @
--}
-
--- layout :: Html () -> Html ()
--- layout = col @ fillViewport
-
-{- | As `layout` but as a 'Attributes
-
-> holygrail = col root $ do
->   ...
 -}
 fillViewport :: (Styleable h) => CSS h -> CSS h
 fillViewport =
@@ -49,10 +37,10 @@ fillViewport =
 
 {- | Lay out children in a row
 
-> row id $ do
->    el_ "Left"
->    space
->    el_ "Right"
+> el ~ flexRow $ do
+>    el "Left"
+>    el " - " ~ grow
+>    el "Right"
 -}
 flexRow :: (Styleable h) => CSS h -> CSS h
 flexRow =
@@ -65,10 +53,10 @@ flexRow =
 
 {- | Lay out children in a column.
 
-> col grow $ do
->    el_ "Top"
->    space
->    el_ "Bottom"
+> el ~ flexCol $ do
+>    el "Top"
+>    el " - " ~ grow
+>    el "Bottom"
 -}
 flexCol :: (Styleable h) => CSS h -> CSS h
 flexCol =
@@ -79,51 +67,19 @@ flexCol =
     ]
 
 
-{- | Grow to fill the available space in the parent 'Web.View.Layout.row' or 'Web.View.Layout.col'
-
-> row id $ do
->  el grow none
->  el_ "Right"
--}
+-- | Grow to fill the available space in the parent 'flexRow' or 'flexCol'
 grow :: (Styleable h) => CSS h -> CSS h
 grow = utility "grow" ["flex-grow" :. "1"]
 
 
-{- | Space that fills the available space in the parent 'Web.View.Layout.row' or 'Web.View.Layout.col'.
-
-
-> row id $ do
->  space
->  el_ "Right"
-
-This is equivalent to an empty element with 'grow'
-
-> space = el grow none
--}
-
 -- space :: (IsHtml h, AppliedParent h ~ h, Styleable h) => h
 -- space = el ~ grow $ none
 
-{- | Make a fixed 'layout' by putting 'scroll' on a child-element
+{- | Stack children on top of each other as layers. Each layer has the full width. See 'popup'
 
-> document = row root $ do
->   nav (width 300) "Sidebar"
->   col (grow . scroll) "Main Content"
--}
-scroll :: (Styleable h) => CSS h -> CSS h
-scroll = utility "scroll" ["overflow" :. "auto"]
-
-
-{- | A Nav element
-nav :: (IsHtml h) => h -> h
-nav = tag "nav"
--}
-
-{- | Stack children on top of each other. Each child has the full width. See 'popup'
-
-> stack id $ do
->   layer id "Background"
->   layer (bg Black . opacity 0.5) "Overlay"
+> el ~ stack $ do
+>   el "Background"
+>   el ~ bg Black . opacity 0.5 $ "Overlay"
 -}
 stack :: (Styleable h) => CSS h -> CSS h
 stack =
@@ -146,22 +102,22 @@ stack =
       ]
 
 
-{- | This 'layer' is not included in the 'stack' size, and covers content outside of it. If used outside of stack, the popup is offset from the entire page.
+{- | Place an element above others, out of the flow of the page
 
-> stack id $ do
->   layer id $ input (value "Autocomplete Box")
->   layer (popup (TRBL 50 0 0 0)) $ do
->     el_ "Item 1"
->     el_ "Item 2"
->     el_ "Item 3"
-> el_ "This is covered by the menu"
+> el ~ stack $ do
+>   input @ value "Autocomplete Box"
+>   el ~ popup (TL 10 10) $ do
+>     el "Item 1"
+>     el "Item 2"
+>     el "Item 3"
+> el "This would be covered by the menu"
 -}
 popup :: (Styleable h) => Sides Length -> CSS h -> CSS h
 popup sides =
   position Absolute . inset sides
 
 
--- | Set top, bottom, right, and left. See 'Web.View.Layout.stack' and 'Web.View.Layout.popup'
+-- | Set 'top', 'bottom', 'right', and 'left' all at once
 inset :: (Styleable h) => Sides Length -> CSS h -> CSS h
 inset = sides' (\n -> top n . right n . bottom n . left n) top right bottom left
 
@@ -204,12 +160,31 @@ instance ToClassName FlexWrap where
   toClassName WrapReverse = "rev"
 
 
+{- | Set the flex-wrap
+
+@
+el ~ flexWrap 'WrapReverse' $ do
+  el "one"
+  el "two"
+  el "three"
+el ~ flexWrap 'Wrap' $ do
+  el "one"
+  el "two"
+  el "three"
+@
+-}
 flexWrap :: (PropertyStyle FlexWrap w, ToClassName w, Styleable h) => w -> CSS h -> CSS h
 flexWrap w =
   utility ("fwrap" -. w) ["flex-wrap" :. propertyStyle @FlexWrap w]
 
 
--- | position:absolute, relative, etc. See 'Web.View.Layout.stack' and 'Web.View.Layout.popup'
+{- | position:absolute, relative, etc. See 'stack' and 'popup' for a higher-level interface
+
+@
+tag "nav" ~ position Fixed . height 100 $ "Navigation bar"
+tag "div" ~ flexCol . margin (T 100) $ "Main Content"
+@
+-}
 position :: (Styleable h) => Position -> CSS h -> CSS h
 position p = utility ("pos" -. p) ["position" :. style p]
 
@@ -228,7 +203,10 @@ zIndex n = utility ("z" -. n) ["z-index" :. style n]
 
 {- | Set container display
 
-el (display None) "HIDDEN"
+@
+el ~ (display 'None') $ "none"
+el ~ (display 'Block') $ "block"
+@
 -}
 display :: (PropertyStyle Display d, ToClassName d, Styleable h) => d -> CSS h -> CSS h
 display disp =
@@ -243,15 +221,22 @@ instance PropertyStyle Display Display
 instance PropertyStyle Display None
 
 
+-- | Set `visiblity: hidden`
 hidden :: (Styleable h) => CSS h -> CSS h
 hidden = utility "hidden" ["visibility" :. "hidden"]
 
 
+-- | Set `visiblity: visible`
 visible :: (Styleable h) => CSS h -> CSS h
 visible = utility "hidden" ["visibility" :. "visible"]
 
 
--- | Set to a specific width
+{- | Set to specific width
+
+> el ~ width 100 $ "100px"
+> el ~ width (PxRem 100) $ "100px"
+> el ~ width (Pct 50) $ "50pct"
+-}
 width :: (Styleable h) => Length -> CSS h -> CSS h
 width n =
   utility
@@ -261,7 +246,6 @@ width n =
     ]
 
 
--- | Set to a specific height
 height :: (Styleable h) => Length -> CSS h -> CSS h
 height n =
   utility

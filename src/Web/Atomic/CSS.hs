@@ -1,36 +1,148 @@
+{- |
+Module:      Web.Atomic
+Copyright:   (c) 2023 Sean Hess
+License:     BSD3
+Maintainer:  Sean Hess <seanhess@gmail.com>
+Stability:   experimental
+Portability: portable
+
+Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
+
+> import Web.Atomic
+>
+> example :: Html ()
+> example = col ~ gap 10 $ do
+>  el ~ bold . fontSize 32 $ "My page"
+>  button ~ border 1 $ "Click Me"
+
+See [Web.Atomic](Web-Atomic.html) for a complete introduction
+-}
 module Web.Atomic.CSS
-  ( module Web.Atomic.CSS.Select
-  , module Web.Atomic.CSS.Box
-  , module Web.Atomic.CSS.Text
-  , module Web.Atomic.CSS.Transition
-  , module Web.Atomic.CSS.Layout
-  , module Web.Atomic.Types.Styleable
-  , module Web.Atomic.Types.Style
-  , Media (..)
-  , module Web.Atomic.CSS.Reset
-  -- not sure where to put these
+  ( -- * Atomic CSS
+    Styleable ((~))
+  , utility
+  , css
+  , cls
+
+    -- * CSS Utilities
+
+    -- ** Layout
+  , display
+  , Display (..)
+  , hidden
+  , visible
+  , width
+  , height
+  , minWidth
+  , minHeight
+  , position
+  , Position (..)
+  , inset
+  , top
+  , bottom
+  , right
+  , left
+
+    -- ** Flexbox
+  , flexRow
+  , flexCol
+  , grow
+  , flexDirection
+  , FlexDirection (..)
+  , flexWrap
+  , FlexWrap (..)
+
+    -- ** Window
+  , fillViewport
+  , zIndex
+
+    -- ** Stack
+  , stack
+  , popup
+
+    -- ** Box Model
+  , pad
+  , gap
+  , margin
+  , bg
+  , border
+  , borderWidth
+  , borderColor
+  , borderStyle
+  , BorderStyle (..)
+  , rounded
+  , opacity
+  , clip
+  , scroll
+
+    -- ** Text
+  , bold
+  , fontSize
+  , color
+  , italic
+  , underline
+  , textAlign
+  , Align (..)
+  , textWrap
+  , TextWrap
+
+    -- ** CSS Transitions
+  , transition
+  , TransitionProperty (..)
+
+    -- ** Other
   , list
   , ListType (..)
   , pointer
+
+    -- ** Selector Modifiers
+  , hover
+  , active
+  , even
+  , odd
+  , descendentOf
+  , media
+  , Media (..)
+
+    -- ** Colors
+  , ToColor (..)
+  , HexColor (..)
+
+    -- * CSS Reset
+  , cssResetEmbed
+  , cssResetUrl
+
+    -- ** Types
+  , Property
+  , Declaration (..)
+  , Style
+  , ToStyle (..)
+  , PropertyStyle (..)
+  , None (..)
+  , Length (..)
+  , PxRem (..)
+  , Ms (..)
+  , Wrap (..)
+  , Sides (..)
+  , CSS
   ) where
 
-import Web.Atomic.CSS.Box
+import Web.Atomic.CSS.Box hiding (sides, sides')
 import Web.Atomic.CSS.Layout
 import Web.Atomic.CSS.Reset
-import Web.Atomic.CSS.Select (active, descendentOf, even, hover, media, odd)
+import Web.Atomic.CSS.Select hiding (addAncestor, addMedia, addPseudo)
 import Web.Atomic.CSS.Text
 import Web.Atomic.CSS.Transition
 import Web.Atomic.Types
-import Web.Atomic.Types.Style
-import Web.Atomic.Types.Styleable (CSS, Styleable, cls, css, utility, (~))
+import Prelude hiding (even, odd, truncate)
 
 
 {- | Set the list style of an item
 
-> ol id $ do
->   li (list Decimal) "First"
->   li (list Decimal) "Second"
->   li (list Decimal) "Third"
+> tag "ol" $ do
+>   tag "li" ~ list Decimal $ "one"
+>   tag "li" ~ list Decimal $ "two"
+>   tag "li" ~ list Decimal $ "three"
 -}
 list :: (ToClassName l, PropertyStyle ListType l, Styleable h) => l -> CSS h -> CSS h
 list a =
@@ -51,9 +163,15 @@ Button-like elements:
 
 > btn = pointer . bg Primary . hover (bg PrimaryLight)
 >
-> options = row id $ do
->   el btn "Login"
->   el btn "Sign Up"
+> options = do
+>   el ~ btn $ "Login"
+>   el ~ btn $ "Sign Up"
 -}
 pointer :: (Styleable h) => CSS h -> CSS h
 pointer = utility "pointer" ["cursor" :. "pointer"]
+
+
+{- $use
+
+See
+-}

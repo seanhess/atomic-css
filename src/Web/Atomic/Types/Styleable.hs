@@ -7,6 +7,11 @@ import Web.Atomic.Types.Style
 
 
 class Styleable h where
+  -- | Apply a CSS utility to some html
+  --
+  -- > el ~ bold . border 1 $ "styled"
+  -- > el "styled" ~ bold . border 1
+  -- > el "not styled"
   (~) :: h -> (CSS h -> CSS h) -> h
   h ~ f =
     flip modCSS h $ \rs ->
@@ -28,12 +33,12 @@ instance {-# OVERLAPPABLE #-} (Styleable a, Styleable b) => Styleable (a -> b) w
        in CSS m2
 
 
-  modCSS r hh = \content ->
+  modCSS r hh content =
     modCSS r $ hh content
 
 
 instance Styleable [Rule] where
-  modCSS f rs = f rs
+  modCSS f = f
 
 
 instance Styleable (CSS h) where
@@ -48,20 +53,53 @@ mapRules :: (Rule -> Rule) -> CSS a -> CSS a
 mapRules f (CSS rs) = CSS $ fmap f rs
 
 
+{- | Create an atomic CSS utility. These are classes that set a single property, allowing you to compose styles like functions
+
+@
+bold :: 'Styleable' h => 'CSS' h -> 'CSS' h
+bold = utility "bold" ["font-weight" :. "bold"]
+
+pad :: 'Styleable' h => 'PxRem' -> 'CSS' h -> 'CSS' h
+pad px = utility ("pad" -. px) ["padding" :. 'style' px]
+
+example = el ~ bold . pad 10 $ "Padded and bold"
+@
+-}
+utility :: (Styleable h) => ClassName -> [Declaration] -> CSS h -> CSS h
+utility cn ds (CSS rs) =
+  CSS $ rule cn ds : rs
+
+
+{- | Apply a class name with no styles. Useful for external CSS
+
+> el ~ cls "parent" $ do
+>   el ~ cls "item" $ "one"
+>   el ~ cls "item" $ "two"
+-}
 cls :: (Styleable h) => ClassName -> CSS h -> CSS h
 cls cn (CSS rs) =
   CSS $ Rule.fromClass cn : rs
 
 
--- Custom CSS
+{- | Embed CSS with a custom selector and apply it to an element. Modifiers like 'hover' will ignore this
+
+> listItems =
+>   css
+>     "list"
+>     ".list > .item"
+>     [ "display" :. "list-item"
+>     , "list-style" :. "square"
+>     ]
+>
+> example = do
+>   el ~ listItems $ do
+>     el ~ cls "item" $ "one"
+>     el ~ cls "item" $ "two"
+>     el ~ cls "item" $ "three"
+-}
 css :: (Styleable h) => ClassName -> Selector -> [Declaration] -> CSS h -> CSS h
 css cn sel ds (CSS rs) =
   CSS $ Rule cn (CustomRule sel) mempty ds : rs
-
-
-utility :: (Styleable h) => ClassName -> [Declaration] -> CSS h -> CSS h
-utility cn ds (CSS rs) =
-  CSS $ rule cn ds : rs
 
 
 -- | Get all the rules for combined utilities

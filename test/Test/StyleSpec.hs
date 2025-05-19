@@ -95,7 +95,7 @@ mainSpec = do
 
   describe "External Classes" $ do
     it "adds external classes" $ do
-      let rs :: [Rule] = [] ~ cls "external"
+      let CSS rs = CSS [] ~ cls "external"
       rs `shouldBe` [Rule "external" mempty mempty []]
       fmap (.className) rs `shouldBe` ["external"]
 

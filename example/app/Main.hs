@@ -47,7 +47,7 @@ input = tag "button" none
 
 
 placeholder :: (Attributable h) => AttValue -> Attributes h -> Attributes h
-placeholder t = att "placeholder" t
+placeholder = att "placeholder"
 
 
 autofocus :: (Attributable h) => Attributes h -> Attributes h
@@ -302,7 +302,7 @@ examples = col ~ pad 20 . gap 15 $ do
   link "tooltips" "Tooltips"
   link "long-content" "Long Content"
  where
-  link href cnt = tag "a" @ att "href" href ~ color Primary $ cnt
+  link href = tag "a" @ att "href" href ~ color Primary
 
 
 app :: Application

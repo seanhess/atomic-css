@@ -1,29 +1,37 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Web.Atomic.CSS.Box where
 
 import Web.Atomic.Types
 
 
--- | Cut off the contents of the element
-truncate :: (Styleable h) => CSS h -> CSS h
-truncate =
+-- | Cut off content that goes beyond the element size
+clip :: (Styleable h) => CSS h -> CSS h
+clip =
   utility
-    "truncate"
+    "clip"
     [ "white-space" :. "nowrap"
     , "overflow" :. "hidden"
     , "text-overflow" :. "ellipsis"
     ]
 
 
+{- | Make a fixed 'layout' by putting 'scroll' on a child-element
+
+> document = el ~ flexRow . fillViewport $ do
+>   tag "nav" ~ width 300 $ "Sidebar"
+>   tag "div" ~ scroll . grow $ "Main Content"
+-}
+scroll :: (Styleable h) => CSS h -> CSS h
+scroll = utility "scroll" ["overflow" :. "auto"]
+
+
 {- | Space surrounding the children of the element
 
-To create even spacing around and between all elements:
+To create even spacing around and between all elements combine with 'gap'
 
-> col (pad 10 . gap 10) $ do
->   el_ "one"
->   el_ "two"
->   el_ "three"
+> el ~ flexCol . pad 10 . gap 10 $ do
+>   el "one"
+>   el "two"
+>   el "three"
 -}
 pad :: (Styleable h) => Sides Length -> CSS h -> CSS h
 pad =
@@ -35,6 +43,7 @@ gap :: (Styleable h) => Length -> CSS h -> CSS h
 gap n = utility ("gap" -. n) ["gap" :. style n]
 
 
+-- | Element margin. Using 'gap' and 'pad' on parents is more intuitive and usually makes margin redundant
 margin :: (Styleable h) => Sides Length -> CSS h -> CSS h
 margin =
   sides "m" ("margin" <>)
@@ -42,8 +51,8 @@ margin =
 
 {- | Add a drop shadow to an element
 
-> input (shadow Inner) "Inset Shadow"
-> button (shadow ()) "Click Me"
+> input ~ shadow Inner $ "Inset Shadow"
+> button ~ shadow () $ "Click Me"
 -}
 shadow :: (Styleable h, PropertyStyle Shadow a, ToClassName a) => a -> CSS h -> CSS h
 shadow a =
@@ -68,12 +77,16 @@ bg :: (ToColor clr, Styleable h) => clr -> CSS h -> CSS h
 bg c = utility ("bg" -. colorName c) ["background-color" :. style (colorValue c)]
 
 
-data BorderStyle
-  = Solid
-  | Dashed
-  deriving (Show, ToStyle, ToClassName)
+-- | Round the corners of the element
+rounded :: (Styleable h) => Length -> CSS h -> CSS h
+rounded n = utility ("rnd" -. n) ["border-radius" :. style n]
 
 
+{- | Set a border around the element
+
+> el ~ border 1 $ "all sides"
+> el ~ border (X 1) $ "only left and right"
+-}
 border :: (Styleable h) => Sides PxRem -> CSS h -> CSS h
 border s = borderWidth s . borderStyle Solid
 
@@ -82,16 +95,12 @@ borderStyle :: (Styleable h) => BorderStyle -> CSS h -> CSS h
 borderStyle s = utility ("brds" -. s) ["border-style" :. style s]
 
 
--- | Round the corners of the element
-rounded :: (Styleable h) => Length -> CSS h -> CSS h
-rounded n = utility ("rnd" -. n) ["border-radius" :. style n]
+data BorderStyle
+  = Solid
+  | Dashed
+  deriving (Show, ToStyle, ToClassName)
 
 
-{- | Set a border around the element
-
-> el (border 1) "all sides"
-> el (border (X 1)) "only left and right"
--}
 borderWidth :: (Styleable h) => Sides PxRem -> CSS h -> CSS h
 borderWidth =
   sides "brd" prop

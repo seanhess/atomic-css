@@ -12,7 +12,6 @@ fontSize :: (Styleable h) => Length -> CSS h -> CSS h
 fontSize n = utility ("fs" -. n) ["font-size" :. style n]
 
 
--- | Set the text color. See 'Web.View.Types.ToColor'
 color :: (Styleable h) => (ToColor clr) => clr -> CSS h -> CSS h
 color c = utility ("clr" -. colorName c) ["color" :. style (colorValue c)]
 

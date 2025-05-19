@@ -77,8 +77,8 @@ element nm = Element False nm mempty mempty mempty
 
 
 instance Attributable (Html a) where
-  modAttributes f h =
-    mapElement (\elm -> elm{attributes = f elm.attributes}) h
+  modAttributes f =
+    mapElement (\elm -> elm{attributes = f elm.attributes})
 
 
 tag :: Text -> Html () -> Html ()
@@ -99,8 +99,8 @@ raw t = Html () [Raw t]
 
 
 instance Styleable (Html a) where
-  modCSS f h =
-    mapElement (\elm -> elm{css = f elm.css}) h
+  modCSS f =
+    mapElement (\elm -> elm{css = f elm.css})
 
 
 htmlCSSRules :: Html a -> Map Selector Rule
@@ -115,23 +115,9 @@ nodeCSSRules = \case
 
 elementCSSRules :: Element -> Map Selector Rule
 elementCSSRules elm =
-  ruleMap elm.css <> (mconcat $ fmap nodeCSSRules elm.content)
+  ruleMap elm.css <> mconcat (fmap nodeCSSRules elm.content)
 
 
 elementClasses :: Element -> [ClassName]
 elementClasses elm =
-  -- fmap (.className) $ elm.css <> M.elems elm.styles
-  L.sort $ fmap ruleClassName $ elm.css
-
--- -- TEST --------------------------
---
--- asdf :: (Attributable h) => Attributes h -> Attributes h
--- asdf = att "asdf" "hello"
---
---
--- asdf2 :: Attributes (Html a -> Html a) -> Attributes (Html a -> Html a)
--- asdf2 = att "asdf" "hello"
---
---
--- test :: Html ()
--- test = tag "div" @ asdf2 $ none
+  L.sort $ fmap ruleClassName elm.css

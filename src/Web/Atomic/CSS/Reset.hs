@@ -7,7 +7,7 @@ import Data.FileEmbed
 import Data.Text
 
 
-{- | Default CSS to remove unintuitive default styles. This or 'cssResetLink' is required.
+{- | Default CSS to remove unintuitive default styles. This or 'cssResetLink' is required for utilities to work as expected, especially the box model.
 
 > import Data.String.Interpolate (i)
 >
@@ -32,10 +32,10 @@ cssResetEmbed = $(embedFile "embed/preflight.css")
 > toDocument cnt =
 >   [i|<html>
 >     <head>
->       <link rel="stylesheet" href="#{cssResetLink}">
+>       <link rel="stylesheet" href="#{cssResetUrl}">
 >     </head>
 >     <body>#{cnt}</body>
 >   </html>|]
 -}
-cssResetLink :: Text
-cssResetLink = "<link rel=\"stylesheet\" href=\"https://unpkg.com/tailwindcss@3.3.3/src/css/preflight.css\"/>"
+cssResetUrl :: Text
+cssResetUrl = "<link rel=\"stylesheet\" href=\"https://unpkg.com/tailwindcss@3.3.3/src/css/preflight.css\"/>"
