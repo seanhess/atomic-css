@@ -119,9 +119,9 @@ responsive = do
 
 holygrail :: Html ()
 holygrail = col ~ fillViewport $ do
-  row ~ (bg Primary) $ "Top Bar"
+  row ~ bg Primary $ "Top Bar"
   row ~ grow $ do
-    col ~ (bg Secondary) $ "Left Sidebar"
+    col ~ bg Secondary $ "Left Sidebar"
     col ~ grow $ do
       text "Content Upper Left"
       space
@@ -139,7 +139,7 @@ tooltips = do
     mapM_ viewItemRow ["One", "Two", "Three", "Four", "Five", "Six"]
  where
   viewItemRow item = do
-    col ~ stack . showTooltips . hover (color red) $ do
+    col ~ stack . showTooltips . hover (color red) . pointer $ do
       el ~ border 1 . bg White $ text item
       el ~ cls "tooltip" . popup (TR 10 10) . zIndex 1 . hidden $ do
         col ~ border 2 . gap 5 . bg White . pad 5 $ do
@@ -151,7 +151,7 @@ tooltips = do
     css
       "tooltips"
       ".tooltips:hover > .tooltip"
-      (declarations hidden)
+      (declarations visible)
 
   red = HexColor "#F00"
 

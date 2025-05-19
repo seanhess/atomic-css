@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Web.Atomic.CSS.Box where
 
 import Web.Atomic.Types
@@ -24,21 +26,8 @@ To create even spacing around and between all elements:
 >   el_ "three"
 -}
 pad :: (Styleable h) => Sides Length -> CSS h -> CSS h
-pad (All n) =
-  utility ("p" -. n) ["padding" :. style n]
-pad (Y n) = pad (T n) . pad (B n)
-pad (X n) = pad (L n) . pad (R n)
-pad (XY x y) = pad (X x) . pad (Y y)
-pad (TRBL t r b l) =
-  pad (T t) . pad (R r) . pad (B b) . pad (L l)
-pad (T x) = utility ("pt" -. x) ["padding-top" :. style x]
-pad (R x) = utility ("pr" -. x) ["padding-right" :. style x]
-pad (B x) = utility ("pb" -. x) ["padding-bottom" :. style x]
-pad (L x) = utility ("pl" -. x) ["padding-left" :. style x]
-pad (TR t r) = pad (TRBL t r 0 0)
-pad (TL t l) = pad (TRBL t 0 0 l)
-pad (BR b r) = pad (TRBL 0 r b 0)
-pad (BL b l) = pad (TRBL 0 0 b l)
+pad =
+  sides "p" ("padding" <>)
 
 
 -- | The space between child elements. See 'pad'
@@ -47,21 +36,8 @@ gap n = utility ("gap" -. n) ["gap" :. style n]
 
 
 margin :: (Styleable h) => Sides Length -> CSS h -> CSS h
-margin (All n) =
-  utility ("m" -. n) ["margin" :. style n]
-margin (Y n) = margin (T n) . margin (B n)
-margin (X n) = margin (L n) . margin (R n)
-margin (XY x y) = margin (X x) . margin (Y y)
-margin (TRBL t r b l) =
-  margin (T t) . margin (R r) . margin (B b) . margin (L l)
-margin (T x) = utility ("mt" -. x) ["margin-top" :. style x]
-margin (R x) = utility ("mr" -. x) ["margin-right" :. style x]
-margin (B x) = utility ("mb" -. x) ["margin-bottom" :. style x]
-margin (L x) = utility ("ml" -. x) ["margin-left" :. style x]
-margin (TR t r) = margin (TRBL t r 0 0)
-margin (TL t l) = margin (TRBL t 0 0 l)
-margin (BR b r) = margin (TRBL 0 r b 0)
-margin (BL b l) = margin (TRBL 0 0 b l)
+margin =
+  sides "m" ("margin" <>)
 
 
 {- | Add a drop shadow to an element
@@ -117,21 +93,11 @@ rounded n = utility ("rnd" -. n) ["border-radius" :. style n]
 > el (border (X 1)) "only left and right"
 -}
 borderWidth :: (Styleable h) => Sides PxRem -> CSS h -> CSS h
-borderWidth (All n) =
-  utility ("brd" -. n) ["border-width" :. style n]
-borderWidth (Y n) = borderWidth (T n) . borderWidth (B n)
-borderWidth (X n) = borderWidth (L n) . borderWidth (R n)
-borderWidth (XY x y) = borderWidth (X x) . borderWidth (Y y)
-borderWidth (TRBL t r b l) =
-  borderWidth (T t) . borderWidth (R r) . borderWidth (B b) . borderWidth (L l)
-borderWidth (T x) = utility ("brdt" -. x) ["border-top-width" :. style x]
-borderWidth (R x) = utility ("brdt" -. x) ["border-right-width" :. style x]
-borderWidth (B x) = utility ("brdt" -. x) ["border-bottom-width" :. style x]
-borderWidth (L x) = utility ("brdt" -. x) ["border-left-width" :. style x]
-borderWidth (TR t r) = borderWidth (TRBL t r 0 0)
-borderWidth (TL t l) = borderWidth (TRBL t 0 0 l)
-borderWidth (BR b r) = borderWidth (TRBL 0 r b 0)
-borderWidth (BL b l) = borderWidth (TRBL 0 0 b l)
+borderWidth =
+  sides "brd" prop
+ where
+  prop "" = "border-width"
+  prop p = "border" <> p <> "-width"
 
 
 -- | Set a border color. See 'Web.View.Types.ToColor'
@@ -143,3 +109,34 @@ borderColor c =
 opacity :: (Styleable h) => Float -> CSS h -> CSS h
 opacity n =
   utility ("opacity" -. n) ["opacity" :. style n]
+
+
+-- | utilities for every side with (Sides a)
+sides :: (Styleable h, ToStyle a, ToClassName a, Num a) => ClassName -> (Property -> Property) -> Sides a -> CSS h -> CSS h
+sides c toProp =
+  sides'
+    (\a -> utility (c -. a) [toProp "" :. style a])
+    (\a -> utility (c <> "t" -. a) [toProp "-top" :. style a])
+    (\a -> utility (c <> "r" -. a) [toProp "-right" :. style a])
+    (\a -> utility (c <> "b" -. a) [toProp "-bottom" :. style a])
+    (\a -> utility (c <> "l" -. a) [toProp "-left" :. style a])
+
+
+-- | case analysis for (Sides a)
+sides' :: (Styleable h, ToStyle a, ToClassName a, Num a) => (a -> CSS h -> CSS h) -> (a -> CSS h -> CSS h) -> (a -> CSS h -> CSS h) -> (a -> CSS h -> CSS h) -> (a -> CSS h -> CSS h) -> Sides a -> CSS h -> CSS h
+sides' all_ top right bottom left s =
+  case s of
+    (All n) -> all_ n
+    (Y n) -> top n . bottom n
+    (X n) -> left n . right n
+    (XY x y) -> top y . bottom y . left x . right x
+    (TRBL t r b l) ->
+      top t . right r . bottom b . left l
+    (T x) -> top x
+    (R x) -> right x
+    (B x) -> bottom x
+    (L x) -> left x
+    (TR t r) -> top t . right r
+    (TL t l) -> top t . left l
+    (BR b r) -> bottom b . right r
+    (BL b l) -> bottom b . left l

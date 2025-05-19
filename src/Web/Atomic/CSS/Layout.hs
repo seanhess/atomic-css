@@ -5,6 +5,7 @@
 
 module Web.Atomic.CSS.Layout where
 
+import Web.Atomic.CSS.Box (sides')
 import Web.Atomic.Types
 
 
@@ -162,22 +163,7 @@ popup sides =
 
 -- | Set top, bottom, right, and left. See 'Web.View.Layout.stack' and 'Web.View.Layout.popup'
 inset :: (Styleable h) => Sides Length -> CSS h -> CSS h
-inset sides = off sides
- where
-  off = \case
-    All n -> off (TRBL n n n n)
-    Y n -> off (XY 0 n)
-    X n -> off (XY n 0)
-    XY x y -> off (TRBL y x y x)
-    TRBL t r b l -> top t . right r . bottom b . left l
-    T x -> top x
-    R x -> right x
-    B x -> bottom x
-    L x -> left x
-    TR t r -> top t . right r
-    TL t l -> top t . left l
-    BR b r -> bottom b . right r
-    BL b l -> bottom b . left l
+inset = sides' (\n -> top n . right n . bottom n . left n) top right bottom left
 
 
 top :: (Styleable h) => Length -> CSS h -> CSS h

@@ -11,7 +11,7 @@ import Web.Atomic.Types.ClassName (ToClassName (..), className)
 
 
 newtype Property = Property Text
-  deriving newtype (Show, Eq, Ord, IsString)
+  deriving newtype (Show, Eq, Ord, IsString, Semigroup)
 
 
 data Declaration = Property :. Style

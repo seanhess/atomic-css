@@ -50,7 +50,7 @@ instance ToClassName () where
 cn -. a = joinClassSegments "-" cn (toClassName a)
 
 
-infixl 6 -.
+infixl 7 -.
 
 
 joinClassSegments :: Text -> ClassName -> ClassName -> ClassName
