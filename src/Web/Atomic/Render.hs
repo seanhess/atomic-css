@@ -3,25 +3,26 @@
 module Web.Atomic.Render where
 
 import Data.ByteString.Lazy qualified as BL
+import Data.List qualified as L
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as M
 import Data.Maybe (mapMaybe)
 import Data.String (IsString (..))
 import Data.Text (Text, intercalate, pack)
 import Data.Text qualified as T
-import Data.Text.Lazy qualified as L
-import Data.Text.Lazy.Encoding qualified as LE
+import Data.Text.Lazy qualified as TL
+import Data.Text.Lazy.Encoding qualified as TLE
 import HTMLEntities.Text qualified as HE
 import Web.Atomic.Html
 import Web.Atomic.Types
 
 
-renderLazyText :: Html () -> L.Text
-renderLazyText = L.fromStrict . renderText
+renderLazyText :: Html () -> TL.Text
+renderLazyText = TL.fromStrict . renderText
 
 
 renderLazyByteString :: Html () -> BL.ByteString
-renderLazyByteString = LE.encodeUtf8 . renderLazyText
+renderLazyByteString = TLE.encodeUtf8 . renderLazyText
 
 
 {- | Renders a 'View' as HTML with embedded CSS class definitions
@@ -178,7 +179,7 @@ addIndent n (Line e ind t) = Line e (ind + n) t
 
 -- | Render lines to text
 renderLines :: [Line] -> Text
-renderLines = snd . foldl' nextLine (False, "")
+renderLines = snd . L.foldl' nextLine (False, "")
  where
   nextLine :: (Bool, Text) -> Line -> (Bool, Text)
   nextLine (newline, t) l = (nextNewline l, t <> currentLine newline l)

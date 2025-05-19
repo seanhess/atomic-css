@@ -55,7 +55,7 @@ rule cn ds = Rule cn mempty mempty ds
 
 
 ruleMap :: [Rule] -> Map Selector Rule
-ruleMap rs = foldl' (\m r -> M.insert (ruleSelector r) r m) M.empty rs
+ruleMap rs = L.foldl' (\m r -> M.insert (ruleSelector r) r m) M.empty rs
 
 
 {- | Add a property to a class
