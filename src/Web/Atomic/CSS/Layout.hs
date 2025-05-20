@@ -1,41 +1,54 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE DerivingStrategies #-}
 
+{- |
+Module:      Web.Atomic.CSS.Layout
+Copyright:   (c) 2023 Sean Hess
+License:     BSD3
+Maintainer:  Sean Hess <seanhess@gmail.com>
+Stability:   experimental
+Portability: portable
+
+We can intuitively create layouts by combining of 'flexRow', 'flexCol', 'grow', and 'stack'
+
+
+@
+holygrail = do
+  el ~ flexCol . grow $ do
+    el ~ flexRow $ "Top Bar"
+    el ~ flexRow . grow $ do
+      el ~ flexCol $ "Left Sidebar"
+      el ~ flexCol . grow $ "Main Content"
+      el ~ flexCol $ "Right Sidebar"
+    el ~ flexRow $ "Bottom Bar"
+@
+
+Also see 'Web.Atomic.Html.Tag.col',  'Web.Atomic.Html.Tag.row', and  'Web.Atomic.Html.Tag.space'
+-}
 module Web.Atomic.CSS.Layout where
 
 import Web.Atomic.CSS.Box (sides')
 import Web.Atomic.Types
 
 
-{- | We can intuitively create layouts with combinations of 'row', 'col', 'stack', 'grow', and 'space'
+{- | Lay out children in a column. See 'Web.Atomic.Html.Tag.col'
 
-Wrap main content in 'layout' to allow the view to consume vertical screen space
-
-@
-holygrail = do
-  col ~ fillViewport $ do
-    row "Top Bar"
-    row ~ grow $ do
-      col "Left Sidebar"
-      col ~ grow $ "Main Content"
-      col "Right Sidebar"
-    row "Bottom Bar"
-@
+> el ~ flexCol $ do
+>    el "Top"
+>    el " - " ~ grow
+>    el "Bottom"
 -}
-fillViewport :: (Styleable h) => CSS h -> CSS h
-fillViewport =
+
+
+flexCol :: (Styleable h) => CSS h -> CSS h
+flexCol =
   utility
-    "fill-viewport"
-    -- [ ("white-space", "pre")
-    [ "width" :. "100vw"
-    , "height" :. "100vh"
-    , -- not sure if this property is necessary, copied from older code
-      "min-height" :. "100vh"
-    , "z-index" :. "0"
+    "col"
+    [ "display" :. "flex"
+    , "flex-direction" :. style Column
     ]
 
-
-{- | Lay out children in a row
+{- | Lay out children in a row. See 'Web.Atomic.Html.Tag.row'
 
 > el ~ flexRow $ do
 >    el "Left"
@@ -51,20 +64,6 @@ flexRow =
     ]
 
 
-{- | Lay out children in a column.
-
-> el ~ flexCol $ do
->    el "Top"
->    el " - " ~ grow
->    el "Bottom"
--}
-flexCol :: (Styleable h) => CSS h -> CSS h
-flexCol =
-  utility
-    "col"
-    [ "display" :. "flex"
-    , "flex-direction" :. style Column
-    ]
 
 
 -- | Grow to fill the available space in the parent 'flexRow' or 'flexCol'
@@ -221,15 +220,14 @@ instance PropertyStyle Display Display
 instance PropertyStyle Display None
 
 
--- | Set `visiblity: hidden`
-hidden :: (Styleable h) => CSS h -> CSS h
-hidden = utility "hidden" ["visibility" :. "hidden"]
+data Visibility
+  = Visible
+  | Hidden
+  deriving (Show, ToClassName, ToStyle)
 
 
--- | Set `visiblity: visible`
-visible :: (Styleable h) => CSS h -> CSS h
-visible = utility "hidden" ["visibility" :. "visible"]
-
+visibility :: Styleable h => Visibility -> CSS h -> CSS h
+visibility v = utility ("vis" -. v) ["visibility" :. style v]
 
 {- | Set to specific width
 
@@ -238,21 +236,11 @@ visible = utility "hidden" ["visibility" :. "visible"]
 > el ~ width (Pct 50) $ "50pct"
 -}
 width :: (Styleable h) => Length -> CSS h -> CSS h
-width n =
-  utility
-    ("w" -. n)
-    [ "width" :. style n
-    , "flex-shrink" :. "0"
-    ]
+width n = utility ("w" -. n) [ "width" :. style n ]
 
 
 height :: (Styleable h) => Length -> CSS h -> CSS h
-height n =
-  utility
-    ("h" -. n)
-    [ "height" :. style n
-    , "flex-shrink" :. "0"
-    ]
+height n = utility ("h" -. n) [ "height" :. style n ]
 
 
 -- | Allow width to grow to contents but not shrink any smaller than value
@@ -265,3 +253,17 @@ minWidth n =
 minHeight :: (Styleable h) => Length -> CSS h -> CSS h
 minHeight n =
   utility ("mh" -. n) ["min-height" :. style n]
+
+
+data Overflow
+  = Scroll
+  | Clip
+  deriving (Show, ToStyle, ToClassName)
+instance PropertyStyle Overflow Overflow
+instance PropertyStyle Overflow Auto
+instance PropertyStyle Overflow Visibility
+
+
+-- | Control how an element clips content that exceeds its bounds 
+overflow :: (PropertyStyle Overflow o, ToClassName o, Styleable h) => o -> CSS h -> CSS h
+overflow o = utility ("over" -. o) ["overflow" :. propertyStyle @Overflow o]

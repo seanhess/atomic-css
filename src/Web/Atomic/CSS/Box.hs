@@ -3,27 +3,6 @@ module Web.Atomic.CSS.Box where
 import Web.Atomic.Types
 
 
--- | Cut off content that goes beyond the element size
-clip :: (Styleable h) => CSS h -> CSS h
-clip =
-  utility
-    "clip"
-    [ "white-space" :. "nowrap"
-    , "overflow" :. "hidden"
-    , "text-overflow" :. "ellipsis"
-    ]
-
-
-{- | Make a fixed 'layout' by putting 'scroll' on a child-element
-
-> document = el ~ flexRow . fillViewport $ do
->   tag "nav" ~ width 300 $ "Sidebar"
->   tag "div" ~ scroll . grow $ "Main Content"
--}
-scroll :: (Styleable h) => CSS h -> CSS h
-scroll = utility "scroll" ["overflow" :. "auto"]
-
-
 {- | Space surrounding the children of the element
 
 To create even spacing around and between all elements combine with 'gap'
