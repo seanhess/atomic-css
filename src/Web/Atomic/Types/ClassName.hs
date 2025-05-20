@@ -3,7 +3,6 @@ module Web.Atomic.Types.ClassName where
 import Data.String (IsString (..))
 import Data.Text (Text, pack)
 import Data.Text qualified as T
-import Numeric (showFFloat)
 
 
 -- | A class name
@@ -36,7 +35,7 @@ instance ToClassName Int
 instance ToClassName Text where
   toClassName = className
 instance ToClassName Float where
-  toClassName f = className $ pack $ showFFloat (Just 3) f ""
+  toClassName f = ClassName $ "p" <> pack (show $ round @Float @Int (f * 100))
 instance ToClassName ClassName where
   toClassName = id
 instance ToClassName [ClassName] where
@@ -61,7 +60,7 @@ joinClassSegments sep (ClassName cn1) (ClassName cn2) =
 
 
 addClassState :: (ToClassName a) => a -> ClassName -> ClassName
-addClassState a cn = joinClassSegments ":" (toClassName a) cn
+addClassState a = joinClassSegments ":" (toClassName a)
 
 
 -- appendClassSegments :: (ToClassName a) => [a] -> ClassName -> ClassName

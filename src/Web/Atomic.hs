@@ -6,10 +6,10 @@ Maintainer:  Sean Hess <seanhess@gmail.com>
 Stability:   experimental
 Portability: portable
 
-Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
+Type-safe, composable CSS utility functions. Inspired by Tailwindcss and Elm-UI
 -}
 module Web.Atomic
-  ( -- * How to use this library
+  ( -- * Haskell functions instead of classes
     -- $use
     module Web.Atomic.Types
 
@@ -24,6 +24,12 @@ module Web.Atomic
   , tag
   , none
   , raw
+  , text
+
+  -- ** Layout
+  , module Web.Atomic.Html.Tag
+
+  -- ** Rendering
   , renderText
   , renderLazyText
   , renderLazyByteString
@@ -33,13 +39,13 @@ import Web.Atomic.CSS
 import Web.Atomic.Html
 import Web.Atomic.Render
 import Web.Atomic.Types
+import Web.Atomic.Html.Tag
 
 
 -- TODO: update readme
--- TODO: decide on a tagline / synopsis and put it everywhere
 
 {- $html
-We also provide an Html Monad and combinator library with basic functions to generate html and add attributes with the `(@)` operator
+Atomic-css also provides an Html Monad and combinator library with basic functions to generate html and add attributes with the `(@)` operator
 -}
 
 
@@ -56,27 +62,28 @@ pad px = utility ("pad" -. px) ["padding" :. 'style' px]
 example = el ~ bold . pad 10 $ "Padded and bold"
 @
 
-See Web.Atomic.CSS for a full list of utilities provided by this library
+Web.Atomic.CSS contains many useful utilities:
 -}
 
 
 {- $use
 
-Create stylish html using composable haskell functions:
+Style your html with composable CSS utility functions:
 
 @
-'el' ~ 'bold' $ "Hello World"
+'el' ~ 'bold' . 'pad' 8 $ "Hello World"
 @
 
-This renders as the following HTML with embedded CSS definitions
+This renders as the following HTML with embedded CSS utility classes:
 
 > <style type='text/css'>
 > .bold { font-weight:bold }
+> .p-8 { padding:0.500rem }
 > </style>
 >
-> <div class='bold'>Hello World</div>
+> <div class='bold p-8'>Hello World</div>
 
-Instead of relying on the fickle cascade, factor and compose styles with the full power of Haskell functions!
+Instead of relying on the fickle cascade for code reuse, factor and compose styles with the full power of Haskell functions!
 
 > header = bold
 > h1 = header . fontSize 32
@@ -86,8 +93,7 @@ Instead of relying on the fickle cascade, factor and compose styles with the ful
 > example = el ~ page $ do
 >   el ~ h1 $ "My Page"
 >   el ~ h2 $ "Introduction"
->   el "lorem ipsum yada yada yada"
->   ...
+>   el "lorem ipsum..."
 
 This approach is inspired by Tailwindcss' [Utility Classes](https://tailwindcss.com/docs/styling-with-utility-classes)
 -}

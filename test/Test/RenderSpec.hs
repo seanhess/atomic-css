@@ -4,7 +4,7 @@
 module Test.RenderSpec (spec) where
 
 import Control.Monad (zipWithM_)
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import Data.Text qualified as T
 import Data.Text.IO qualified as T
 import Skeletest
@@ -45,7 +45,7 @@ pseudoSpec :: Spec
 pseudoSpec = do
   it "creates pseudo suffix" $ do
     let CSS rs = hover @(Html ()) bold $ CSS mempty
-    fmap (ruleSelector) rs `shouldBe` [".hover\\:bold:hover"]
+    fmap ruleSelector rs `shouldBe` [".hover\\:bold:hover"]
 
 
 -- pseudoSuffix Hover `shouldBe` ":hover"
@@ -102,7 +102,7 @@ flatSpec = do
     elementAttributes elm `shouldBe` FlatAttributes [("class", "another myclass")]
 
   it "no duplicate attributes" $ do
-    let Attributes attributes = att "key" "one" $ att "key" "two" $ mempty :: Attributes (Html ())
+    let Attributes attributes = att "key" "one" $ att "key" "two" mempty :: Attributes (Html ())
     let elm = (element "div"){attributes}
     elementAttributes elm `shouldBe` FlatAttributes [("key", "one")]
 
@@ -201,6 +201,10 @@ htmlSpec = do
               el "world"
       let out = renderText html
       zipWithM_ shouldBe (T.lines out) (T.lines basic)
+
+    it "intro example" $ do
+      let html = el ~ bold . pad 8 $ "Hello World"
+      mapM_ (putStrLn . unpack) $ T.lines $ renderText html
 
     it "renders external classes" $ do
       renderText (el ~ cls "woot" $ none) `shouldBe` "<div class='woot'></div>"

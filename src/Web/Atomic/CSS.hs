@@ -31,8 +31,8 @@ module Web.Atomic.CSS
     -- ** Layout
   , display
   , Display (..)
-  , hidden
-  , visible
+  , visibility
+  , Visibility (..)
   , width
   , height
   , minWidth
@@ -44,8 +44,10 @@ module Web.Atomic.CSS
   , bottom
   , right
   , left
+  , overflow
 
     -- ** Flexbox
+    -- $flexbox
   , flexRow
   , flexCol
   , grow
@@ -55,7 +57,6 @@ module Web.Atomic.CSS
   , FlexWrap (..)
 
     -- ** Window
-  , fillViewport
   , zIndex
 
     -- ** Stack
@@ -74,8 +75,6 @@ module Web.Atomic.CSS
   , BorderStyle (..)
   , rounded
   , opacity
-  , clip
-  , scroll
 
     -- ** Text
   , bold
@@ -85,8 +84,8 @@ module Web.Atomic.CSS
   , underline
   , textAlign
   , Align (..)
-  , textWrap
-  , TextWrap
+  , whiteSpace
+  , WhiteSpace (..)
 
     -- ** CSS Transitions
   , transition
@@ -112,7 +111,6 @@ module Web.Atomic.CSS
 
     -- * CSS Reset
   , cssResetEmbed
-  , cssResetUrl
 
     -- ** Types
   , Property
@@ -121,6 +119,8 @@ module Web.Atomic.CSS
   , ToStyle (..)
   , PropertyStyle (..)
   , None (..)
+  , Auto (..)
+  , Normal (..)
   , Length (..)
   , PxRem (..)
   , Ms (..)
@@ -176,4 +176,21 @@ pointer = utility "pointer" ["cursor" :. "pointer"]
 {- $use
 
 See
+-}
+
+
+{- $flexbox
+
+We can intuitively create layouts by combining of 'flexRow', 'flexCol', 'grow', and 'stack'
+
+@
+holygrail = do
+  el ~ flexCol . grow $ do
+    el ~ flexRow $ "Top Bar"
+    el ~ flexRow . grow $ do
+      el ~ flexCol $ "Left Sidebar"
+      el ~ flexCol . grow $ "Main Content"
+      el ~ flexCol $ "Right Sidebar"
+    el ~ flexRow $ "Bottom Bar"
+@
 -}

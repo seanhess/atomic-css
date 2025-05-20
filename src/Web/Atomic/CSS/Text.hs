@@ -39,15 +39,17 @@ textAlign a =
   utility ("ta" -. a) ["text-align" :. style a]
 
 
-data TextWrap
-instance PropertyStyle TextWrap Wrap
+data WhiteSpace
+  = Pre
+  | PreWrap
+  | PreLine
+  | BreakSpaces
+  deriving (Show, ToClassName, ToStyle)
+instance PropertyStyle WhiteSpace Wrap
+instance PropertyStyle WhiteSpace Normal
+instance PropertyStyle WhiteSpace WhiteSpace
 
 
---   = Balance
---   | Pretty
---   | Stable
---   deriving (Show, ToStyleValue, ToClassName)
-
-textWrap :: (PropertyStyle TextWrap w, ToClassName w, Styleable h) => w -> CSS h -> CSS h
-textWrap w =
-  utility ("twrap" -. w) ["text-wrap" :. propertyStyle @TextWrap w]
+whiteSpace :: (PropertyStyle WhiteSpace w, ToClassName w, Styleable h) => w -> CSS h -> CSS h
+whiteSpace w =
+  utility ("wspace" -. w) ["white-space" :. propertyStyle @WhiteSpace w]

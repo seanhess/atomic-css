@@ -6,8 +6,8 @@ cabal-version: 2.2
 
 name:           atomic-css
 version:        0.1.0
-synopsis:       Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI
-description:    Type-safe Atomic CSS with intuitive layouts and composable css utility classes. Inspired by Tailwindcss and Elm-UI . See documentation for the @Web.Atomic@ module below
+synopsis:       Type-safe, composable CSS utility functions. Inspired by Tailwindcss and Elm-UI
+description:    Type-safe, composable CSS utility functions. Inspired by Tailwindcss and Elm-UI . See documentation for the @Web.Atomic@ module below
 category:       Web
 homepage:       https://github.com/seanhess/atomic-css
 bug-reports:    https://github.com/seanhess/atomic-css/issues
@@ -20,7 +20,7 @@ tested-with:
     GHC == 9.8.2
   , GHC == 9.6.6
 extra-source-files:
-    embed/preflight.css
+    embed/reset.css
 extra-doc-files:
     README.md
     CHANGELOG.md
@@ -41,6 +41,7 @@ library
       Web.Atomic.CSS.Text
       Web.Atomic.CSS.Transition
       Web.Atomic.Html
+      Web.Atomic.Html.Tag
       Web.Atomic.Render
       Web.Atomic.Types
       Web.Atomic.Types.Attributable

@@ -78,6 +78,16 @@ data None = None
   deriving (Show, ToClassName, ToStyle)
 
 
+data Normal = Normal
+  deriving (Show, ToStyle)
+instance ToClassName Normal where
+  toClassName Normal = "norm"
+
+
+data Auto = Auto
+  deriving (Show, ToStyle, ToClassName)
+
+
 -- -- | Convert a type to a prop name
 -- class ToProp a where
 --   toProp :: a -> Text
@@ -103,13 +113,13 @@ newtype PxRem = PxRem' Int
 instance Num Length where
   PxRem p1 + PxRem p2 = PxRem $ p1 + p2
   -- 10 + 10% = 10 + 10% of 10 = 11
-  PxRem p1 + Pct pct = PxRem $ round $ (fromIntegral p1) * (1 + pct)
+  PxRem p1 + Pct pct = PxRem $ round $ fromIntegral p1 * (1 + pct)
   Pct pct + PxRem p1 = PxRem p1 + Pct pct
   Pct p1 + Pct p2 = Pct $ p1 + p2
 
 
   PxRem p1 * PxRem p2 = PxRem $ p1 + p2
-  PxRem p1 * Pct pct = PxRem $ round $ (fromIntegral p1) * pct
+  PxRem p1 * Pct pct = PxRem $ round $ fromIntegral p1 * pct
   Pct pct * PxRem p1 = PxRem p1 * Pct pct
   Pct p1 * Pct p2 = Pct $ p1 * p2
 

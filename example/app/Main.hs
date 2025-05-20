@@ -18,18 +18,6 @@ main = do
   Warp.run 3010 app
 
 
-col :: Html () -> Html ()
-col = tag "div" ~ flexCol
-
-
-row :: Html () -> Html ()
-row = tag "div" ~ flexRow
-
-
-space :: Html ()
-space = tag "div" ~ grow $ none
-
-
 nav :: Html () -> Html ()
 nav = tag "nav"
 
@@ -73,7 +61,7 @@ buttons = col ~ gap 10 . pad 20 $ do
 
 inputs :: Html ()
 inputs = do
-  col ~ fillViewport . pad 20 . gap 10 $ do
+  col ~ grow . pad 20 . gap 10 $ do
     el ~ bold $ "INPUT"
     input @ placeholder "Not Focused" ~ border 1 . pad 10 . bg White
     input @ placeholder "Should Focus" @ autofocus ~ border 1 . pad 10 . bg White
@@ -81,30 +69,33 @@ inputs = do
 
 responsive :: Html ()
 responsive = do
-  col ~ fillViewport . big flexRow $ do
-    nav ~ gap 10 . pad 20 . bg Primary . color White . small topbar . big sidebar $ do
-      el ~ bold $ "SIDEBAR"
-      el "One"
-      el "Two"
-      el "Three"
+  nav ~ pad 20 . gap 10 . bg Primary . color White . menu $ do
+    el ~ bold $ "MENU"
+    el "One"
+    el "Two"
+    el "Three"
 
-    col ~ scroll . grow . pad 20 . gap 20 . bg White $ do
-      el ~ bold . fontSize 24 $ "Make the window smaller"
-      el "This demonstrates how to create a responsive design. Resize the window under 800px wide and the nav bar will switch to a top bar"
+  col ~ content . grow . pad 20 . gap 20 . bg White $ do
+    el ~ bold . fontSize 24 $ "Make the window smaller"
+    el "This demonstrates how to create a responsive design. Resize the window under 800px wide and the nav bar will switch to a top bar"
 
-      col ~ color Gray . gap 20 $ do
-        el $ text lorem
-        el $ text lorem
-        el $ text lorem
-        el $ text lorem
-        el $ text lorem
-        el $ text lorem
-        el $ text lorem
+    col ~ color Gray . gap 20 $ do
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
  where
-  -- oh no@ the @ operator converts everythign to attributes@
-  -- and I need them to be CSS only@
-  sidebar = width 250 <> flexCol
-  topbar = height 100 <> flexRow
+  menuWidth = 250
+  menuHeight = 70
+
+  menu = big sidebar . small topbar
+  sidebar = width menuWidth . position Fixed . flexCol . top 0 . bottom 0 . left 0
+  topbar = height menuHeight . position Fixed . flexRow . top 0 . left 0 . right 0
+
+  content = big (margin (L menuWidth)) . small (margin (T menuHeight))
 
   big :: (Styleable c) => (CSS c -> CSS c) -> (CSS c -> CSS c)
   big = media (MinWidth 800)
@@ -114,7 +105,7 @@ responsive = do
 
 
 holygrail :: Html ()
-holygrail = col ~ fillViewport $ do
+holygrail = col ~ grow $ do
   row ~ bg Primary $ "Top Bar"
   row ~ grow $ do
     col ~ bg Secondary $ "Left Sidebar"
@@ -137,7 +128,7 @@ tooltips = do
   viewItemRow item = do
     col ~ stack . showTooltips . hover (color red) . pointer $ do
       el ~ border 1 . bg White $ text item
-      el ~ cls "tooltip" . popup (TR 10 10) . zIndex 1 . hidden $ do
+      el ~ cls "tooltip" . popup (TR 10 10) . zIndex 1 . visibility Hidden $ do
         col ~ border 2 . gap 5 . bg White . pad 5 $ do
           el ~ bold $ "ITEM DETAILS"
           el $ text item
@@ -147,13 +138,13 @@ tooltips = do
     css
       "tooltips"
       ".tooltips:hover > .tooltip"
-      (declarations visible)
+      (declarations $ visibility Visible)
 
   red = HexColor "#F00"
 
 
 stacks :: Html ()
-stacks = col ~ fillViewport $ do
+stacks = col ~ grow $ do
   row ~ bg Primary . bold . pad 10 . color White $ "Stacks"
   col ~ pad 10 . gap 10 $ do
     el "Stacks put contents on top of each other"
@@ -250,9 +241,9 @@ texts = col ~ gap 10 . pad 20 $ do
     el ~ border 1 . pad 5 $ "eight"
     el ~ border 1 . pad 5 $ "nine"
 
-  el ~ bold $ "textWrap"
-  el ~ border 1 . width 200 . textWrap NoWrap $ text lorem
-  el ~ border 1 . width 200 . textWrap Wrap $ text lorem
+  el ~ bold $ "White Space: text wrap"
+  el ~ border 1 . width 200 . whiteSpace NoWrap . overflow Hidden $ text lorem
+  el ~ border 1 . width 200 . whiteSpace Wrap $ text lorem
 
   el ~ bold $ "css order"
   el ~ flexCol . flexRow $ do

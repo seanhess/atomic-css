@@ -3,73 +3,85 @@ Atomic CSS
 
 [![Hackage](https://img.shields.io/hackage/v/atomic-css.svg)][hackage]
 
-Type-safe HTML and CSS with intuitive layout and composable styles. Inspired by Tailwindcss and Elm-UI
+Type-safe, composable CSS utility functions. Inspired by Tailwindcss and Elm-UI
+
 
 ### Write Haskell instead of CSS
 
-Type-safe utility functions to generate styled HTML.
+Style your html with composable CSS utility functions:
 
 ```haskell
-myPage = col (gap 10) $ do
-  el (bold . fontSize 32) "My page"
-  button (border 1) "Click Me"
+el ~ bold . pad 8 $ "Hello World"
 ```
 
-Leverage the full power of Haskell functions for reuse, instead of relying on CSS.
+This renders as the following HTML with embedded CSS utility classes:
+
+```html
+<style type='text/css'>
+.bold { font-weight:bold }
+.p-8 { padding:0.500rem }
+</style>
+
+<div class='bold p-8'>Hello World</div>
+```
+
+Instead of relying on the fickle cascade, factor and compose styles with the full power of Haskell functions!
 
 ```haskell
 header = bold
 h1 = header . fontSize 32
 h2 = header . fontSize 24
-page = gap 10
+page = flexCol . gap 10 . pad 10
 
-myPage = col page $ do
-  el h1 "My Page"
-  ...
+example = el ~ page $ do
+  el ~ h1 $ "My Page"
+  el ~ h2 $ "Introduction"
+  el "lorem ipsum..."
 ```
 
-This approach is inspired by Tailwindcss' [Utility Classes](https://tailwindcss.com/docs/utility-first)
+This approach is inspired by Tailwindcss' [Utility Classes](https://tailwindcss.com/docs/styling-with-utility-classes)
 
-### Intuitive Layouts
 
-Easily create layouts with `row`, `col`, `grow`, and `space`
+### Intuitive Flexbox Layouts
+
+Create complex layouts with `row`, `col`, `grow`, and `space`
 
 ```haskell
-holygrail :: View c ()
-holygrail = layout id $ do
-  row section "Top Bar"
-  row grow $ do
-    col section "Left Sidebar"
-    col (section . grow) "Main Content"
-    col section "Right Sidebar"
-  row section "Bottom Bar"
-  where section = 'border' 1
+holygrail = do
+  col ~ grow $ do
+    row "Top Bar"
+    row ~ grow $ do
+      col "Left Sidebar"
+      col ~ grow $ "Main Content"
+      col "Right Sidebar"
+    row "Bottom Bar"
 ```
-
-### Embedded CSS
-
-Views track which styles are used in any child node, and automatically embed all CSS when rendered. 
-
-    >>> renderText $ el bold "Hello"
-    
-    <style type='text/css'>.bold { font-weight:bold }</style>
-    <div class='bold'>Hello</div>
-
 
 ### Stateful Styles
 
-We can apply styles when certain states apply. For example, to change the background on hover:
+We can apply utilities when certain states apply. For example, to change the background on hover:
 
 ```haskell
-button (bg Primary . hover (bg PrimaryLight)) "Hover Me"
+button ~ bg Primary . hover (bg PrimaryLight) $ "Hover Me"
 ```
 
 Media states allow us to create responsive designs
 
 ```haskell
-el (width 100 . media (MinWidth 800) (width 400))
+el ~ width 100 . media (MinWidth 800) (width 400) $ do
   "Big if window > 800"
 ```
+
+
+### Embedded CSS
+
+Only the utilities used in a given html fragment are rendered:
+
+    >>> renderText $ el ~ bold $ "Hello"
+    
+    <style type='text/css'>.bold { font-weight:bold }</style>
+    <div class='bold'>Hello</div>
+
 
 ### Try Example Project with Nix
 
