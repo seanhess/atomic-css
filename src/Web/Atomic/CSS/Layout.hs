@@ -9,7 +9,7 @@ Maintainer:  Sean Hess <seanhess@gmail.com>
 Stability:   experimental
 Portability: portable
 
-We can intuitively create layouts by combining of 'flexRow', 'flexCol', 'grow', and 'stack'
+We can intuitively create layouts by combining 'flexRow', 'flexCol', 'grow', and 'stack'
 
 
 @

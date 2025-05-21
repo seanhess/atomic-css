@@ -2,10 +2,11 @@
 
 ## atomic-css 0.1.0
 
-This package renamed to atomic-css with a focus on css utilities. View, Url and other Hyperbole-specific types moved to Hyperbole. Still provides an Html monad
+Renamed library to atomic-css with a focus on css utilities. View, Url and other Hyperbole-specific types moved to Hyperbole. Still provides an Html monad
+
 Major rewrite of Library and API
   * New interface with operators: (@) for attributes, (~) to utilities
-  * Defining custom CSS and new utilities is more intuitive
+  * Defining custom CSS selectors and new utilities is more intuitive
 
 ## web-view 0.7.0
 
@@ -28,7 +29,6 @@ Major rewrite of Library and API
 * extClass to add external css class
 * inline elements
 * Url: no longer lowercases automatically. Show/Read instance
-* 
 
 ## web-view 0.4.0
 

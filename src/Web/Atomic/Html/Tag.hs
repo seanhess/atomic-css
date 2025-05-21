@@ -6,7 +6,7 @@ Maintainer:  Sean Hess <seanhess@gmail.com>
 Stability:   experimental
 Portability: portable
 
-We can intuitively create layouts by combining of 'row', 'col', 'space', and 'stack'
+We can intuitively create layouts by combining 'row', 'col', 'space', and 'stack'
 
 @
 holygrail = do

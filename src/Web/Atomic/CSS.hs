@@ -188,7 +188,7 @@ See
 
 {- $flexbox
 
-We can intuitively create layouts by combining of 'flexRow', 'flexCol', 'grow', and 'stack'
+We can intuitively create layouts by combining 'flexRow', 'flexCol', 'grow', and 'stack'
 
 @
 holygrail = do
