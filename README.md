@@ -1,7 +1,12 @@
 Web View
 ============
 
+## DEPRECATED
+
+This package has been renamed to [atomic-css](http://github.com/seanhess/atomic-css), focusing on css utilities. `View` features like `context` have been moved to [hyperbole](https://github.com/seanhess/hyperbole)
+
 [![Hackage](https://img.shields.io/hackage/v/web-view.svg)][hackage]
+
 
 Type-safe HTML and CSS with intuitive layout and composable styles. Inspired by Tailwindcss and Elm-UI
 
