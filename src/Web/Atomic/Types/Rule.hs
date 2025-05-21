@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module Web.Atomic.Types.Rule where
 
 import Data.List qualified as L
@@ -22,7 +20,7 @@ data Rule = Rule
   }
 instance Eq Rule where
   r1 == r2 = ruleSelector r1 == ruleSelector r2
-instance Ord (Rule) where
+instance Ord Rule where
   r1 <= r2 = ruleSelector r1 <= ruleSelector r2
 instance IsString Rule where
   fromString s = fromClass (fromString s)
@@ -41,21 +39,17 @@ instance Monoid RuleSelector where
   mempty = GeneratedRule id id
 
 
--- rule :: ClassName -> [Declaration] -> Rule
--- rule cn ds =
---   (Rule cn (selector cn) mempty ds)
-
 -- | An empty rule that only adds the classname
 fromClass :: ClassName -> Rule
 fromClass cn = Rule cn mempty mempty mempty
 
 
 rule :: ClassName -> [Declaration] -> Rule
-rule cn ds = Rule cn mempty mempty ds
+rule cn = Rule cn mempty mempty
 
 
 ruleMap :: [Rule] -> Map Selector Rule
-ruleMap rs = L.foldl' (\m r -> M.insert (ruleSelector r) r m) M.empty rs
+ruleMap = L.foldl' (\m r -> M.insert (ruleSelector r) r m) M.empty
 
 
 {- | Add a property to a class
@@ -80,7 +74,7 @@ mapClassName f c =
 uniqueRules :: [Rule] -> [Rule]
 uniqueRules [] = []
 uniqueRules (r : rs) =
-  r : (replaceRules r $ uniqueRules rs)
+  r : replaceRules r (uniqueRules rs)
 
 
 replaceRules :: Rule -> [Rule] -> [Rule]

@@ -59,6 +59,7 @@ joinClassSegments sep (ClassName cn1) (ClassName cn2) =
   ClassName $ cn1 <> sep <> cn2
 
 
+-- modifiers to a class are prepended with ":", like hover\:my-class:hover
 addClassState :: (ToClassName a) => a -> ClassName -> ClassName
 addClassState a = joinClassSegments ":" (toClassName a)
 

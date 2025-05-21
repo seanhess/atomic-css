@@ -75,6 +75,9 @@ module Web.Atomic.CSS
   , BorderStyle (..)
   , rounded
   , opacity
+  , shadow
+  , Shadow
+  , Inner (..)
 
     -- ** Text
   , bold
@@ -91,7 +94,7 @@ module Web.Atomic.CSS
   , transition
   , TransitionProperty (..)
 
-    -- ** Other
+    -- ** Elements
   , list
   , ListType (..)
   , pointer
@@ -112,7 +115,7 @@ module Web.Atomic.CSS
     -- * CSS Reset
   , cssResetEmbed
 
-    -- ** Types
+    -- * Types
   , Property
   , Declaration (..)
   , Style
@@ -127,6 +130,10 @@ module Web.Atomic.CSS
   , Wrap (..)
   , Sides (..)
   , CSS
+
+    -- * Other
+  , declarations
+  , rules
   ) where
 
 import Web.Atomic.CSS.Box hiding (sides, sides')

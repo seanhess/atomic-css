@@ -23,11 +23,6 @@ spec = do
       let rs = [fs24, bold, fs12]
       fmap (.className) (uniqueRules rs) `shouldBe` ["fs-24", "bold"]
 
-    -- it "should unset same property using (~)" $ do
-    --   let rs = [] ~ fontSize 12 . bold ~ fontSize 24
-    --   length rs `shouldBe` 3
-    --   fmap (.className) (uniqueRules rs) `shouldBe` ["fs-24", "bold"]
-
     it "should treat hover states as unique" $ do
       let hoverBold = addPseudo "hover" bold
           hoverNormal = addPseudo "hover" normal
@@ -46,16 +41,13 @@ spec = do
       ruleClassName (Rule.fromClass "hello") `shouldBe` "hello"
 
     it "includes pseudo" $ do
-      ruleClassName (addPseudo "active" $ addPseudo "hover" $ "hello") `shouldBe` "active:hover:hello"
+      ruleClassName (addPseudo "active" $ addPseudo "hover" "hello") `shouldBe` "active:hover:hello"
 
     it "includes media" $ do
       ruleClassName (addMedia (MinWidth 100) "hello") `shouldBe` "mmnw100:hello"
 
     it "includes pseudo + media" $ do
       ruleClassName (addMedia (MinWidth 100) $ addPseudo "hover" "hello") `shouldBe` "mmnw100:hover:hello"
-
-  -- it "doesn't change with custom selectors" $ do
-  --   ruleClassName (Rule "hello" (Just ".hello") [Hover] [MinWidth 100] []) `shouldBe` "hello"
 
   describe "selector" $ do
     it "creates selector from class name" $ do
