@@ -1,24 +1,25 @@
-name:               web-view
-version:            0.7.0
-synopsis:           Type-safe HTML and CSS with intuitive layouts and composable styles.
-homepage:           https://github.com/seanhess/web-view
-github:             seanhess/web-view
+name:               atomic-css
+version:            0.1.0
+synopsis:           Type-safe, composable CSS utility functions. Inspired by Tailwindcss and Elm-UI
+
+homepage:           https://github.com/seanhess/atomic-css
+github:             seanhess/atomic-css
 license:            BSD-3-Clause
 license-file:       LICENSE
 author:             Sean Hess
 maintainer:         seanhess@gmail.com
 category:           Web
 description:
-  Type-safe HTML and CSS with intuitive layouts and composable styles. Inspired by Tailwindcss and Elm-UI
+  Type-safe, composable CSS utility functions. Inspired by Tailwindcss and Elm-UI
   .
-  See documentation for the @Web.View@ module below
+  See documentation for the @Web.Atomic@ module below
 
 extra-doc-files:
   - README.md
   - CHANGELOG.md
 
 extra-source-files:
-  - embed/preflight.css
+  - embed/reset.css
 
 language: GHC2021
 
@@ -35,6 +36,10 @@ default-extensions:
   - OverloadedRecordDot
   - DuplicateRecordFields
   - NoFieldSelectors
+  - TypeFamilies
+  - DerivingStrategies
+  - DefaultSignatures
+  - DeriveAnyClass
 
 dependencies:
   - base >=4.16 && <5
@@ -43,7 +48,6 @@ dependencies:
   - casing > 0.1.3.0 && <0.2
   - effectful-core >= 2.3 && <3
   - text >= 1.2 && <3
-  - string-interpolate >= 0.3.2 && <0.4
   - file-embed >= 0.0.10 && <0.1
   - http-types >= 0.12 && <0.13
   - html-entities >= 1.1.4.7 && <1.2
@@ -61,5 +65,5 @@ tests:
     - -with-rtsopts=-N
     - -F -pgmF=skeletest-preprocessor
     dependencies:
-      - web-view
+      - atomic-css
       - skeletest

@@ -3,20 +3,13 @@
 
 module Main where
 
-import Data.Bifunctor (first)
-import Data.Function ((&))
-import Data.Map (Map)
-import Data.Map.Strict qualified as M
+import Data.ByteString.Lazy (fromStrict)
 import Data.String.Interpolate (i)
 import Data.Text (Text)
-import Debug.Trace
 import Network.HTTP.Types (status200, status404)
 import Network.Wai
 import Network.Wai.Handler.Warp as Warp
-import Web.View
-import Web.View.Render
-import Web.View.Style
-import Web.View.Types
+import Web.Atomic
 
 
 main :: IO ()
@@ -25,16 +18,36 @@ main = do
   Warp.run 3010 app
 
 
-buttons :: View c ()
-buttons = col (gap 10 . pad 20) $ do
-  el (bold . fontSize 32) "My page"
+nav :: Html () -> Html ()
+nav = tag "nav"
 
-  row (gap 10) $ do
-    button (btn Primary) "Do Something"
-    button (btn Secondary) "Cancel"
 
-  --
-  button' Secondary "Another Example"
+button :: Html () -> Html ()
+button = tag "button"
+
+
+input :: Html ()
+input = tag "button" none
+
+
+placeholder :: (Attributable h) => AttValue -> Attributes h -> Attributes h
+placeholder = att "placeholder"
+
+
+autofocus :: (Attributable h) => Attributes h -> Attributes h
+autofocus = att "autofocus" ""
+
+
+buttons :: Html ()
+buttons = col ~ gap 10 . pad 20 $ do
+  el ~ bold . fontSize 32 $ "My page"
+  el ~ hover bold $ "hover"
+
+  row ~ gap 10 $ do
+    button ~ btn Primary $ "Do Something"
+    button ~ btn Secondary $ "Cancel"
+
+  button' Secondary ~ width 100 $ "Another Example"
  where
   -- Make style functions to encourage reuse
   btn c = bg c . hover (bg (light c)) . color White . rounded 3 . pad 15
@@ -43,216 +56,197 @@ buttons = col (gap 10 . pad 20) $ do
   light _ = Gray
 
   -- alternatively, we can make View functions
-  button' c = button (btn c)
+  button' c = button ~ btn c
 
 
-inputs :: View c ()
+inputs :: Html ()
 inputs = do
-  layout (pad 20 . gap 10) $ do
-    el bold "INPUT"
-    input (border 1 . pad 10 . bg White . placeholder "Not Focused")
-    input (border 1 . pad 10 . bg White . placeholder "Should Focus" . autofocus)
+  col ~ grow . pad 20 . gap 10 $ do
+    el ~ bold $ "INPUT"
+    input @ placeholder "Not Focused" ~ border 1 . pad 10 . bg White
+    input @ placeholder "Should Focus" @ autofocus ~ border 1 . pad 10 . bg White
 
 
-responsive :: View c ()
+responsive :: Html ()
 responsive = do
-  layout (big flexRow) $ do
-    nav (gap 10 . pad 20 . bg Primary . color White . small topbar . big sidebar) $ do
-      el bold "SIDEBAR"
-      el_ "One"
-      el_ "Two"
-      el_ "Three"
+  nav ~ pad 20 . gap 10 . bg Primary . color White . menu $ do
+    el ~ bold $ "MENU"
+    el "One"
+    el "Two"
+    el "Three"
 
-    col (scroll . grow . pad 20 . gap 20 . bg White) $ do
-      el (bold . fontSize 24) "Make the window smaller"
-      el_ "This demonstrates how to create a responsive design. Resize the window under 800px wide and the nav bar will switch to a top bar"
+  col ~ content . grow . pad 20 . gap 20 . bg White $ do
+    el ~ bold . fontSize 24 $ "Make the window smaller"
+    el "This demonstrates how to create a responsive design. Resize the window under 800px wide and the nav bar will switch to a top bar"
 
-      col (color Gray . gap 20) $ do
-        el_ $ text lorem
-        el_ $ text lorem
-        el_ $ text lorem
-        el_ $ text lorem
-        el_ $ text lorem
-        el_ $ text lorem
-        el_ $ text lorem
+    col ~ color Gray . gap 20 $ do
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
+      el $ text lorem
  where
-  sidebar = width 250 . flexCol
-  topbar = height 100 . flexRow
+  menuWidth = 250
+  menuHeight = 70
+
+  menu = big sidebar . small topbar
+  sidebar = width menuWidth . position Fixed . flexCol . top 0 . bottom 0 . left 0
+  topbar = height menuHeight . position Fixed . flexRow . top 0 . left 0 . right 0
+
+  content = big (margin (L menuWidth)) . small (margin (T menuHeight))
+
+  big :: (Styleable c) => (CSS c -> CSS c) -> (CSS c -> CSS c)
   big = media (MinWidth 800)
+
+  small :: (Styleable c) => (CSS c -> CSS c) -> (CSS c -> CSS c)
   small = media (MaxWidth 800)
 
 
-holygrail :: View c ()
-holygrail = layout id $ do
-  row (bg Primary) "Top Bar"
-  row grow $ do
-    col (bg Secondary) "Left Sidebar"
-    col grow $ do
+holygrail :: Html ()
+holygrail = col ~ grow $ do
+  row ~ bg Primary $ "Top Bar"
+  row ~ grow $ do
+    col ~ bg Secondary $ "Left Sidebar"
+    col ~ grow $ do
       text "Content Upper Left"
       space
-      row id $ do
+      row $ do
         space
         text "Content Bottom Right"
-    col (bg Secondary) "Right Sidebar"
-  row (bg Primary) "Bottom Bar"
+    col ~ bg Secondary $ "Right Sidebar"
+  row ~ bg Primary $ "Bottom Bar"
 
 
-tooltips :: View c ()
+tooltips :: Html ()
 tooltips = do
-  col (pad 10 . gap 10 . width 300) $ do
-    el bold "CSS ONLY TOOLTIPS"
+  col ~ pad 10 . gap 10 . width 300 $ do
+    el ~ bold $ "CSS ONLY TOOLTIPS"
     mapM_ viewItemRow ["One", "Two", "Three", "Four", "Five", "Six"]
  where
   viewItemRow item = do
-    -- you must have a name?
-    stack (hover (children "tooltip" visible)) $ do
-      layer id $ el (border 1 . bg White) $ text item
-      layer (popup (TR 10 10) . tooltip . zIndex 1 . hidden) $ do
-        viewTooltipDetails item
+    col ~ stack . showTooltips . hover (color red) . pointer $ do
+      el ~ border 1 . bg White $ text item
+      el ~ cls "tooltip" . popup (TR 10 10) . zIndex 1 . visibility Hidden $ do
+        col ~ border 2 . gap 5 . bg White . pad 5 $ do
+          el ~ bold $ "ITEM DETAILS"
+          el $ text item
+          el "details lorem blah blah blah"
 
-  viewTooltipDetails item =
-    col (border 2 . gap 5 . bg White . pad 5) $ do
-      el bold "ITEM DETAILS"
-      el_ $ text item
-      el_ "details lorem blah blah blah"
+  showTooltips =
+    css
+      "tooltips"
+      ".tooltips:hover > .tooltip"
+      (declarations $ visibility Visible)
 
-  tooltip = addClass $ cls "tooltip"
-
-
--- TODO: run the mod, any classes added should be modified
--- this will ignore any attributes you add!
-children :: Text -> Mod id -> Mod id
-children child f atts =
-  let Attributes cs _ = f mempty
-      final =
-        Attributes
-          { classes = atts.classes <> retargetCSS cs
-          , other = atts.other
-          }
-   in trace (show $ final) final
- where
-  retargetCSS :: Map Selector Class -> Map Selector Class
-  retargetCSS classes =
-    M.fromList $ fmap (\(s, c) -> (targetChildren s, c{selector = targetChildren s})) $ M.toList classes
-
-  targetChildren :: Selector -> Selector
-  targetChildren sel =
-    let res = sel{className = sel.className, child = Just $ ChildWithName child}
-     in trace (show (selectorText sel, selectorText res)) res
+  red = HexColor "#F00"
 
 
-visible :: Mod id
-visible = addClass $ cls "visible" & prop @Text "visibility" "visible"
-
-
-hidden :: Mod id
-hidden = addClass $ cls "hidden" & prop @Text "visibility" "hidden"
-
-
-stacks :: View c ()
-stacks = layout id $ do
-  row (bg Primary . bold . pad 10 . color White) "Stacks"
-  col (pad 10 . gap 10) $ do
-    el_ "Stacks put contents on top of each other"
-    stack (border 1) $ do
-      layer (bg Light . pad 10) "In the background"
-      layer (pad 10) $ do
-        row id $ do
+stacks :: Html ()
+stacks = col ~ grow $ do
+  row ~ bg Primary . bold . pad 10 . color White $ "Stacks"
+  col ~ pad 10 . gap 10 $ do
+    el "Stacks put contents on top of each other"
+    col ~ stack . border 1 $ do
+      el ~ bg Light . pad 10 $ "In the background"
+      col ~ pad 10 $ do
+        row $ do
           space
-          el (bg SecondaryLight . grow . pad 5) "Above"
-      layer (pad (XY 15 5)) $ do
-        row id $ do
+          el ~ bg SecondaryLight . grow . pad 5 $ "Above"
+      el ~ pad (XY 15 5) $ do
+        row $ do
           space
-          el (bg Primary . pad 10 . color White) "Max Above!"
+          el ~ bg Primary . pad 10 . color White $ "Max Above@"
 
-    el_ "We can collapse items in a stack so they don't affect the width"
-    stack (bg Light . pad 10) $ do
-      layer id $ do
-        row (gap 5) $ do
-          el_ "Some"
-          el_ "Stuff"
-          el_ "Here"
-      layer (popup (BR 0 0)) $ col (pad 10 . bg SecondaryLight) $ do
-        el_ "One"
-        el_ "Two"
-        el_ "Three"
-        el_ "Four"
+    el "We can collapse items in a stack so they don't affect the width"
+    col ~ stack . bg Light . pad 10 $ do
+      col $ do
+        row ~ gap 5 $ do
+          el "Some"
+          el "Stuff"
+          el "Here"
+      col ~ popup (BR 0 0) . pad 10 . bg SecondaryLight $ do
+        el "One"
+        el "Two"
+        el "Three"
+        el "Four"
 
-    stack (border 1) $ do
-      layer (bg Light) "Background"
-      layer (bg SecondaryLight . opacity 0.8 . popup (X 50)) $ do
-        el_ "HMM"
-        el_ "OK"
-      layer (flexRow . bg Warning . opacity 0.8) $ do
+    col ~ stack . border 1 $ do
+      col ~ bg Light $ "Background"
+      col ~ bg SecondaryLight . opacity 0.8 . popup (X 50) $ do
+        el "HMM"
+        el "OK"
+      row ~ bg Warning . opacity 0.8 $ do
         space
-        el_ "Overlay"
+        el "Overlay"
 
-    el_ "Example Popup Search"
-    stack (border 1) $ do
-      layer id $ row (bg Light . pad 10) "This is a search bar"
-      layer (popup (TRBL 43 5 5 5) . border 1) $ do
-        col (bg SecondaryLight . pad (L 50) . pad (R 50)) $ do
-          el (hover (bg White) . pointer) "I am a popup"
-          el_ "I am a popup"
-          el_ "I am a popup"
-          el_ "I am a popup"
+    el ~ bold $ "Example Popup Search"
+    el ~ stack . border 1 $ do
+      row ~ bg Light . pad 10 $ "This is a search bar"
+      col ~ popup (TRBL 43 5 5 5) . border 1 $ do
+        col ~ bg SecondaryLight . pad (L 50) . pad (R 50) $ do
+          el ~ hover (bg White) . pointer $ "I am a popup"
+          el "I am a popup"
+          el "I am a popup"
+          el "I am a popup"
 
-    col (gap 10) $ do
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
-      el_ "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+    col ~ gap 10 $ do
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
+      el "Content asldkjfalsdk jjklasd flkajsd flkjasd lfkjalskdfj alsdkjf "
 
-    col (border 1 . popup (TR 5 5)) "I AM AN ELEMENT"
+    col ~ border 1 . popup (TR 5 5) $ "I AM AN ELEMENT"
 
 
-texts :: View c ()
-texts = col (gap 10 . pad 20) $ do
-  el (bg Warning . bg Error) "Error"
-  el (bg Error . bg Warning) "Warning"
+texts :: Html ()
+texts = col ~ gap 10 . pad 20 $ do
+  el ~ bg Warning . bg Error $ "Error"
+  -- el ~ bg Error . bg Warning ~ if True then bold else id $ "Warning"
 
-  el (pad 10) $ do
-    el (parent "htmx-request" flexRow . hide) "Loading..."
-    el (parent "htmx-request" hide . flexRow) "Normal Content"
+  el ~ pad 10 $ do
+    el ~ descendentOf "htmx-request" flexRow . display None $ "Loading..."
+    el ~ descendentOf "htmx-request" (display None) . flexRow $ "Normal Content"
 
-  el italic "Italic Text"
-  el underline "Underline Text"
-  el bold "Bold Text"
+  el ~ italic $ "Italic Text"
+  el ~ underline $ "Underline Text"
+  el ~ bold $ "Bold Text"
 
-  ol id $ do
-    let nums = list Decimal
-    li nums "first"
-    li nums "second"
-    li nums "third"
+  -- ol [] $ do
+  --   let nums = list Decimal
+  --   li nums "first"
+  --   li nums "second"
+  --   li nums "third"
+  --
+  -- ul [] $ do
+  --   li (list Disc) "first"
+  --   li (list Disc) "second"
+  --   li (list None) "third"
 
-  ul id $ do
-    li (list Disc) "first"
-    li (list Disc) "second"
-    li (list None) "third"
+  el ~ bold $ "flexWrap"
+  row ~ gap 5 . width 200 . flexWrap WrapReverse $ do
+    el ~ border 1 . pad 5 $ "one"
+    el ~ border 1 . pad 5 $ "two"
+    el ~ border 1 . pad 5 $ "three"
+    el ~ border 1 . pad 5 $ "four"
+    el ~ border 1 . pad 5 $ "five"
+    el ~ border 1 . pad 5 $ "six"
+    el ~ border 1 . pad 5 $ "seven"
+    el ~ border 1 . pad 5 $ "eight"
+    el ~ border 1 . pad 5 $ "nine"
 
-  el bold "flexWrap"
-  row (gap 5 . width 200 . flexWrap WrapReverse) $ do
-    el (border 1 . pad 5) "one"
-    el (border 1 . pad 5) "two"
-    el (border 1 . pad 5) "three"
-    el (border 1 . pad 5) "four"
-    el (border 1 . pad 5) "five"
-    el (border 1 . pad 5) "six"
-    el (border 1 . pad 5) "seven"
-    el (border 1 . pad 5) "eight"
-    el (border 1 . pad 5) "nine"
+  el ~ bold $ "White Space: text wrap"
+  el ~ border 1 . width 200 . whiteSpace NoWrap . overflow Hidden $ text lorem
+  el ~ border 1 . width 200 . whiteSpace Wrap $ text lorem
 
-  el bold "textWrap"
-  el (border 1 . width 200 . textWrap NoWrap) (text lorem)
-  el (border 1 . width 200 . textWrap Wrap) (text lorem)
-
-  el bold "css order"
-  el (flexCol . flexRow) $ do
+  el ~ bold $ "css order"
+  el ~ flexCol . flexRow $ do
     text "WOOT"
     text "BOOT"
 
@@ -261,18 +255,41 @@ lorem :: Text
 lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 
-examples :: View c ()
-examples = col (pad 20 . gap 15) $ do
-  el (bold . fontSize 24) "Layout"
-  link "buttons" lnk "Buttons"
-  link "responsive" lnk "Responsive"
-  link "holygrail" lnk "Holy Grail"
-  link "stacks" lnk "Stacks"
-  link "text" lnk "Text"
-  link "inputs" lnk "Inputs"
-  link "tooltips" lnk "Tooltips"
+longContent :: Html ()
+longContent = do
+  col ~ gap 10 . pad 10 $ do
+    resultsTable $ replicate 100 "asdf"
  where
-  lnk = color Primary
+  resultsTable langs = do
+    col ~ gap 15 $ do
+      mapM_ languageRow langs
+   where
+    languageRow lang = do
+      col ~ gap 5 $ do
+        button ~ pad (XY 10 2) . border 1 . hover (bg Light) $ "Select"
+        row $ do
+          row $ do
+            row $ do
+              row $ do
+                row $ do
+                  tag "div" ~ bg Light . pad (XY 10 2) . fontSize 16 . textAlign AlignCenter $ text lang
+
+
+-- rows = textAlign AlignCenter . border 1 . borderColor GrayLight
+
+examples :: Html ()
+examples = col ~ pad 20 . gap 15 $ do
+  el ~ bold . fontSize 24 $ "Layout"
+  link "buttons" "Buttons"
+  link "responsive" "Responsive"
+  link "holygrail" "Holy Grail"
+  link "stacks" "Stacks"
+  link "text" "Text"
+  link "inputs" "Inputs"
+  link "tooltips" "Tooltips"
+  link "long-content" "Long Content"
+ where
+  link href = tag "a" @ att "href" href ~ color Primary
 
 
 app :: Application
@@ -286,6 +303,8 @@ app req respond = do
     ["text"] -> view texts
     ["inputs"] -> view inputs
     ["tooltips"] -> view tooltips
+    ["long-content"] -> view longContent
+    ["static", "reset.css"] -> reset
     _ -> notFound
  where
   html h =
@@ -299,9 +318,12 @@ app req respond = do
 
   document cnt =
     [i|<html>
-      <head><style type="text/css">#{cssResetEmbed}</style></head>
+      <head><link rel="stylesheet" type="text/css" href="static/reset.css"></link>
       <body>#{cnt}</body>
     </html>|]
+
+  reset =
+    respond $ responseLBS status200 [("Content-Type", "text/css; charset=utf-8")] (fromStrict cssResetEmbed)
 
 
 data AppColor
