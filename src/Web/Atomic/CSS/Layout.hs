@@ -38,8 +38,6 @@ import Web.Atomic.Types
 >    el " - " ~ grow
 >    el "Bottom"
 -}
-
-
 flexCol :: (Styleable h) => CSS h -> CSS h
 flexCol =
   utility
@@ -47,6 +45,7 @@ flexCol =
     [ "display" :. "flex"
     , "flex-direction" :. style Column
     ]
+
 
 {- | Lay out children in a row. See 'Web.Atomic.Html.Tag.row'
 
@@ -62,8 +61,6 @@ flexRow =
     [ "display" :. "flex"
     , "flex-direction" :. style Row
     ]
-
-
 
 
 -- | Grow to fill the available space in the parent 'flexRow' or 'flexCol'
@@ -226,8 +223,9 @@ data Visibility
   deriving (Show, ToClassName, ToStyle)
 
 
-visibility :: Styleable h => Visibility -> CSS h -> CSS h
+visibility :: (Styleable h) => Visibility -> CSS h -> CSS h
 visibility v = utility ("vis" -. v) ["visibility" :. style v]
+
 
 {- | Set to specific width
 
@@ -236,11 +234,11 @@ visibility v = utility ("vis" -. v) ["visibility" :. style v]
 > el ~ width (Pct 50) $ "50pct"
 -}
 width :: (Styleable h) => Length -> CSS h -> CSS h
-width n = utility ("w" -. n) [ "width" :. style n ]
+width n = utility ("w" -. n) ["width" :. style n]
 
 
 height :: (Styleable h) => Length -> CSS h -> CSS h
-height n = utility ("h" -. n) [ "height" :. style n ]
+height n = utility ("h" -. n) ["height" :. style n]
 
 
 -- | Allow width to grow to contents but not shrink any smaller than value
@@ -249,10 +247,20 @@ minWidth n =
   utility ("mw" -. n) ["min-width" :. style n]
 
 
+maxWidth :: (Styleable h) => Length -> CSS h -> CSS h
+maxWidth n =
+  utility ("mxw" -. n) ["max-width" :. style n]
+
+
 -- | Allow height to grow to contents but not shrink any smaller than value
 minHeight :: (Styleable h) => Length -> CSS h -> CSS h
 minHeight n =
   utility ("mh" -. n) ["min-height" :. style n]
+
+
+maxHeight :: (Styleable h) => Length -> CSS h -> CSS h
+maxHeight n =
+  utility ("mxh" -. n) ["max-height" :. style n]
 
 
 data Overflow
@@ -264,6 +272,6 @@ instance PropertyStyle Overflow Auto
 instance PropertyStyle Overflow Visibility
 
 
--- | Control how an element clips content that exceeds its bounds 
+-- | Control how an element clips content that exceeds its bounds
 overflow :: (PropertyStyle Overflow o, ToClassName o, Styleable h) => o -> CSS h -> CSS h
 overflow o = utility ("over" -. o) ["overflow" :. propertyStyle @Overflow o]
