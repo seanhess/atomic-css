@@ -8,6 +8,7 @@ module Web.View.Render where
 
 import Data.ByteString.Lazy qualified as BL
 import Data.Function ((&))
+import Data.List (foldl')
 import Data.Map.Strict qualified as M
 import Data.Maybe (mapMaybe)
 import Data.String (fromString)
