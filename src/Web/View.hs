@@ -61,7 +61,7 @@ module Web.View
   , input
   , name
   , value
-  , placeholder
+  -- , placeholder
   , autofocus
   , label
   , link
