@@ -25,7 +25,7 @@ class Styleable h where
 infixl 5 ~
 
 
-instance {-# OVERLAPPABLE #-} (Styleable a, Styleable b) => Styleable (a -> b) where
+instance {-# OVERLAPPABLE #-} (Styleable b) => Styleable (a -> b) where
   (~) :: (a -> b) -> (CSS (a -> b) -> CSS (a -> b)) -> (a -> b)
   hh ~ f = \content ->
     hh content ~ \(CSS m) ->

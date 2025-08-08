@@ -45,6 +45,7 @@ module Web.Atomic.CSS
   , right
   , left
   , overflow
+  , Overflow (..)
 
     -- ** Flexbox
     -- $flexbox

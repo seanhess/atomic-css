@@ -33,7 +33,7 @@ class Attributable h where
 infixl 5 @
 
 
-instance {-# OVERLAPPABLE #-} (Attributable a, Attributable b) => Attributable (a -> b) where
+instance {-# OVERLAPPABLE #-} (Attributable b) => Attributable (a -> b) where
   (@) :: (a -> b) -> (Attributes (a -> b) -> Attributes (a -> b)) -> (a -> b)
   hh @ f = \content ->
     hh content @ \(Attributes m) ->
