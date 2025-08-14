@@ -140,6 +140,9 @@ linesSpec = do
   it "renders inline" $ do
     renderLines [Line Inline 0 "one", Line Inline 0 "two"] `shouldBe` "onetwo"
 
+  it "renders inline" $ do
+    renderLines [Line Inline 0 "one", Line Inline 0 "two"] `shouldBe` "onetwo"
+
 
 htmlSpec :: Spec
 htmlSpec = do
@@ -173,6 +176,9 @@ htmlSpec = do
 
     it "renders pseudo class" $ do
       htmlLines 0 (tag "div" ~ hover bold $ none) `shouldBe` ["<div class='hover:bold'></div>"]
+
+    it "renders raw" $ do
+      htmlLines 0 (tag "div" $ raw "hello") `shouldBe` [Line Newline 0 "<div>", Line Inline 0 "hello", Line Newline 0 "</div>"]
 
   describe "renderText" $ do
     it "renders simple output" $ do
@@ -208,6 +214,9 @@ htmlSpec = do
 
     it "renders external classes" $ do
       renderText (el ~ cls "woot" $ none) `shouldBe` "<div class='woot'></div>"
+
+    it "renders raw without leading spaces" $ do
+      renderText (tag' True "div" $ raw "hello") `shouldBe` "<div>hello</div>"
 
   -- it "matches tooltips big example" $ do
   --   golden <- T.readFile "test/resources/tooltips.txt"

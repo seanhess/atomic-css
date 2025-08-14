@@ -47,7 +47,7 @@ nodesLines ind ns = mconcat $ fmap (nodeLines ind) ns
 nodeLines :: Int -> Node -> [Line]
 nodeLines ind (Elem e) = elementLines ind e
 nodeLines _ (Text t) = [Line Inline 0 $ HE.text t]
-nodeLines _ (Raw t) = [Line Newline 0 t]
+nodeLines _ (Raw t) = [Line Inline 0 t]
 
 
 elementLines :: Int -> Element -> [Line]
@@ -174,16 +174,14 @@ addIndent n (Line e ind t) = Line e (ind + n) t
 
 -- | Render lines to text
 renderLines :: [Line] -> Text
-renderLines = snd . L.foldl' nextLine (False, "")
+renderLines = snd . L.foldl' nextLine (Inline, "")
  where
-  nextLine :: (Bool, Text) -> Line -> (Bool, Text)
-  nextLine (newline, t) l = (nextNewline l, t <> currentLine newline l)
+  nextLine :: (LineEnd, Text) -> Line -> (LineEnd, Text)
+  nextLine (end, t) l = (l.end, t <> currentLine end l)
 
-  currentLine :: Bool -> Line -> Text
-  currentLine newline l
-    | newline = "\n" <> spaces l.indent <> l.text
+  currentLine :: LineEnd -> Line -> Text
+  currentLine end l
+    | end == Newline = "\n" <> spaces l.indent <> l.text
     | otherwise = l.text
-
-  nextNewline l = l.end == Newline
 
   spaces n = T.replicate n " "

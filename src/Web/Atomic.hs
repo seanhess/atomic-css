@@ -22,14 +22,15 @@ module Web.Atomic
   , Html
   , el
   , tag
+  , tag'
   , none
   , raw
   , text
 
-  -- ** Layout
+    -- ** Layout
   , module Web.Atomic.Html.Tag
 
-  -- ** Rendering
+    -- ** Rendering
   , renderText
   , renderLazyText
   , renderLazyByteString
@@ -37,9 +38,9 @@ module Web.Atomic
 
 import Web.Atomic.CSS
 import Web.Atomic.Html
+import Web.Atomic.Html.Tag
 import Web.Atomic.Render
 import Web.Atomic.Types
-import Web.Atomic.Html.Tag
 
 
 -- TODO: update readme

@@ -65,7 +65,17 @@ el = tag "div"
 
 tag :: Text -> Html () -> Html ()
 tag nm (Html _ content) = do
-  Html () [Elem $ (element nm){content}]
+  fromElement $ (element nm){content}
+
+
+tag' :: Bool -> Text -> Html () -> Html ()
+tag' inline nm (Html _ content) =
+  fromElement $ (element nm){content, inline}
+
+
+fromElement :: Element -> Html ()
+fromElement elm =
+  Html () [Elem elm]
 
 
 text :: Text -> Html ()
