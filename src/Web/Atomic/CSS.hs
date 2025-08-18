@@ -120,7 +120,7 @@ module Web.Atomic.CSS
   , Property
   , Declaration (..)
   , Style
-  , ToStyle (..)
+  , ToStyle
   , PropertyStyle (..)
   , None (..)
   , Auto (..)
