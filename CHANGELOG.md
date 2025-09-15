@@ -1,5 +1,13 @@
 # Revision history for atomic-css
 
+## atomic-css 0.2.0
+
+* Added Html.Tag
+* refactored overflow, whiteSpace, instead of clip and scroll
+* maxWidth, maxHeight
+* raw is inline
+* change default exports
+
 ## atomic-css 0.1.0
 
 Renamed library to atomic-css with a focus on css utilities. View, Url and other Hyperbole-specific types moved to Hyperbole. Still provides an Html monad
