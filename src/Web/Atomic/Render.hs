@@ -11,6 +11,8 @@ import Data.String (IsString (..))
 import Data.Text (Text, intercalate, pack)
 import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
+import Data.Text.Lazy.Builder (Builder)
+import Data.Text.Lazy.Builder qualified as TB
 import Data.Text.Lazy.Encoding qualified as TLE
 import HTMLEntities.Text qualified as HE
 import Web.Atomic.Html
@@ -18,7 +20,7 @@ import Web.Atomic.Types
 
 
 renderLazyText :: Html () -> TL.Text
-renderLazyText = TL.fromStrict . renderText
+renderLazyText = TB.toLazyText . renderBuilder
 
 
 renderLazyByteString :: Html () -> BL.ByteString
@@ -26,9 +28,13 @@ renderLazyByteString = TLE.encodeUtf8 . renderLazyText
 
 
 renderText :: Html () -> Text
-renderText html =
+renderText = TL.toStrict . renderLazyText
+
+
+renderBuilder :: Html () -> Builder
+renderBuilder html =
   let cs = cssRulesLines $ htmlCSSRules html
-   in renderLines $ addCss cs $ htmlLines 2 html
+   in renderLines $ addCss cs $ htmlLines 0 html
  where
   addCss :: [Line] -> [Line] -> [Line]
   addCss [] cnt = cnt
@@ -37,45 +43,43 @@ renderText html =
 
 
 htmlLines :: Int -> Html a -> [Line]
-htmlLines ind (Html _ ns) = nodesLines ind ns
+htmlLines indent (Html _ ns) = nodesLines indent ns
 
 
 nodesLines :: Int -> [Node] -> [Line]
-nodesLines ind ns = mconcat $ fmap (nodeLines ind) ns
+nodesLines indent = concatMap (nodeLines indent)
 
 
 nodeLines :: Int -> Node -> [Line]
-nodeLines ind (Elem e) = elementLines ind e
-nodeLines _ (Text t) = [Line Inline 0 $ HE.text t]
-nodeLines _ (Raw t) = [Line Inline 0 t]
+nodeLines indent (Elem e) = elementLines indent e
+nodeLines indent (Text t) = [Line Inline indent $ TB.fromText (HE.text t)]
+nodeLines indent (Raw t) = [Line Inline indent $ TB.fromText t]
 
 
 elementLines :: Int -> Element -> [Line]
-elementLines ind elm =
+elementLines indent elm =
   -- special rendering cases for the children
   case (elm.content :: [Node]) of
     [] ->
       -- auto closing creates a bug in chrome. An auto-closed div
       -- absorbs the next children
-      [line $ open <> renderAttributes (elementAttributes elm) <> ">" <> close]
+      [line $ open <> attrs <> ">" <> close]
     [Text t] ->
       -- SINGLE text node, just display it indented
-      [line $ open <> renderAttributes (elementAttributes elm) <> ">" <> HE.text t <> close]
+      [line $ open <> attrs <> ">" <> HE.text t <> close]
     children ->
       -- normal indented rendering
       mconcat
-        [ [line $ open <> renderAttributes (elementAttributes elm) <> ">"]
-        , fmap (addIndent ind) $ nodesLines ind children
+        [ [line $ open <> attrs <> ">"]
+        , nodesLines (indent + 2) children
         , [line close]
         ]
  where
+  attrs = renderAttributes $ elementAttributes elm
   open = "<" <> elm.name
   close = "</" <> elm.name <> ">"
 
-  line t =
-    if elm.inline
-      then Line Inline 0 t
-      else Line Newline 0 t
+  line t = Line (if elm.inline then Inline else Newline) indent (TB.fromText t)
 
 
 -- Attributes ---------------------------------------------------
@@ -124,7 +128,7 @@ cssRuleLine r =
   let sel = (ruleSelector r).text
       props = intercalate "; " (map renderProp r.properties)
       med = mconcat $ fmap mediaCriteria r.media
-   in Just $ Line Newline 0 $ wrapMedia med $ sel <> " { " <> props <> " }"
+   in Just $ Line Newline 0 $ TB.fromText $ wrapMedia med $ sel <> " { " <> props <> " }"
  where
   renderProp :: Declaration -> Text
   renderProp ((Property p) :. cv) = p <> ":" <> renderStyle cv
@@ -154,12 +158,12 @@ styleLines rulesLines =
 -- Lines ---------------------------------------
 -- control inline vs newlines and indent
 
-data Line = Line {end :: LineEnd, indent :: Int, text :: Text}
+data Line = Line {end :: LineEnd, indent :: Int, text :: Builder}
   deriving (Show, Eq)
 
 
 instance IsString Line where
-  fromString s = Line Newline 0 (pack s)
+  fromString s = Line Newline 0 (TB.fromString s)
 
 
 data LineEnd
@@ -168,20 +172,16 @@ data LineEnd
   deriving (Eq, Show)
 
 
-addIndent :: Int -> Line -> Line
-addIndent n (Line e ind t) = Line e (ind + n) t
-
-
 -- | Render lines to text
-renderLines :: [Line] -> Text
-renderLines = snd . L.foldl' nextLine (Inline, "")
+renderLines :: [Line] -> Builder
+renderLines = mconcat . snd . L.mapAccumL nextLine Inline
  where
-  nextLine :: (LineEnd, Text) -> Line -> (LineEnd, Text)
-  nextLine (end, t) l = (l.end, t <> currentLine end l)
+  nextLine :: LineEnd -> Line -> (LineEnd, Builder)
+  nextLine end l = (l.end, renderLine end l)
 
-  currentLine :: LineEnd -> Line -> Text
-  currentLine end l
+  renderLine :: LineEnd -> Line -> Builder
+  renderLine end l
     | end == Newline = "\n" <> spaces l.indent <> l.text
     | otherwise = l.text
 
-  spaces n = T.replicate n " "
+  spaces n = TB.fromText $ T.replicate n " "

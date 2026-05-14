@@ -10,8 +10,10 @@ import Data.List qualified as L
 import Data.Map (Map)
 import Data.Map.Strict qualified as M
 import Data.Maybe (mapMaybe)
-import Data.Text (Text, unpack)
+import Data.Text (Text)
 import Data.Text qualified as T
+import Data.Text.Lazy.Builder qualified as TB
+import Data.Text.Lazy.IO qualified as TL
 import Effectful
 import Effectful.State.Static.Local
 import Text.Blaze.Html (Html)
@@ -28,14 +30,14 @@ import Prelude hiding (div, head, id)
 test :: IO ()
 test = do
   let (_, h2) = execHtml simple
-  putStrLn $ BLC.unpack $ renderMarkup h2
+  BLC.putStrLn $ renderMarkup h2
   putStrLn "------------------------------"
 
   let (rs, h) = execHtml page1
 
-  putStrLn $ unpack $ renderLines $ cssRulesLines $ ruleMap rs
+  TL.putStrLn $ TB.toLazyText $ renderLines $ cssRulesLines $ ruleMap rs
   putStrLn ""
-  putStrLn $ BLC.unpack $ renderMarkup h
+  BLC.putStrLn $ renderMarkup h
 
 
 newtype Fusion a = Fusion {eff :: Eff '[State Html, State [Rule]] a}

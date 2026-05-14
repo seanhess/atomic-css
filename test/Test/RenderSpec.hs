@@ -123,9 +123,6 @@ flatSpec = do
 
 linesSpec :: Spec
 linesSpec = do
-  it "adds indent" $ do
-    addIndent 2 "hello" `shouldBe` Line Newline 2 "hello"
-
   it "renders basic" $ do
     renderLines ["hello"] `shouldBe` "hello"
 
@@ -136,10 +133,7 @@ linesSpec = do
     renderLines [Line Newline 2 "<div>one</div>"] `shouldNotBe` "  <div>one</div>"
 
   it "renders indent 2" $ do
-    renderLines ["<div>", addIndent 2 "text", "</div>"] `shouldBe` "<div>\n  text\n</div>"
-
-  it "renders inline" $ do
-    renderLines [Line Inline 0 "one", Line Inline 0 "two"] `shouldBe` "onetwo"
+    renderLines ["<div>", Line Newline 2 "text", "</div>"] `shouldBe` "<div>\n  text\n</div>"
 
   it "renders inline" $ do
     renderLines [Line Inline 0 "one", Line Inline 0 "two"] `shouldBe` "onetwo"
@@ -162,7 +156,7 @@ htmlSpec = do
     it "indents contents" $ do
       zipWithM_
         shouldBe
-        (htmlLines 2 (tag "div" $ tag "div" "one"))
+        (htmlLines 0 (tag "div" $ tag "div" "one"))
         [ Line Newline 0 "<div>"
         , Line Newline 2 "<div>one</div>"
         , Line Newline 0 "</div>"
@@ -179,7 +173,7 @@ htmlSpec = do
       htmlLines 0 (tag "div" ~ hover bold $ none) `shouldBe` ["<div class='hover:bold'></div>"]
 
     it "renders raw" $ do
-      htmlLines 0 (tag "div" $ raw "hello") `shouldBe` [Line Newline 0 "<div>", Line Inline 0 "hello", Line Newline 0 "</div>"]
+      htmlLines 0 (tag "div" $ raw "hello") `shouldBe` [Line Newline 0 "<div>", Line Inline 2 "hello", Line Newline 0 "</div>"]
 
   describe "renderText" $ do
     it "renders simple output" $ do
