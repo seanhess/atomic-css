@@ -6,10 +6,13 @@ module Main where
 import Data.ByteString.Lazy (fromStrict)
 import Data.String.Interpolate (i)
 import Data.Text (Text)
+import qualified Data.Text as T
+import Data.List (intersperse)
 import Network.HTTP.Types (status200, status404)
 import Network.Wai
 import Network.Wai.Handler.Warp as Warp
 import Web.Atomic
+import Web.Atomic.Html
 
 
 main :: IO ()
@@ -204,6 +207,8 @@ stacks = col ~ grow $ do
 
     col ~ border 1 . popup (TR 5 5) $ "I AM AN ELEMENT"
 
+alignToBaseline :: Styleable h => CSS h -> CSS h
+alignToBaseline = utility "align-to-baseline" ["align-items" :. "baseline"]
 
 texts :: Html ()
 texts = col ~ gap 10 . pad 20 $ do
@@ -218,6 +223,22 @@ texts = col ~ gap 10 . pad 20 $ do
   el ~ underline $ "Underline Text"
   el ~ bold $ "Bold Text"
 
+  el ~ bold $ "text baseline alignment"
+  row ~ gap 20 $ do
+    col $ do
+      el "without baseline alignment"
+      row ~ border 1 . gap 10 . pad 10 $ do
+        el ~ fontSize 12 $ "small"
+        el ~ fontSize 50 $ "big"
+        el ~ fontSize 22 $ "middle"
+
+    col $ do
+      el "with baseline alignment"
+      row ~ alignToBaseline . border 1 . gap 10 . pad 10 $ do
+        el ~ fontSize 12 $ "small"
+        el ~ fontSize 50 $ "big"
+        el ~ fontSize 22 $ "middle"
+
   -- ol [] $ do
   --   let nums = list Decimal
   --   li nums "first"
@@ -229,31 +250,56 @@ texts = col ~ gap 10 . pad 20 $ do
   --   li (list Disc) "second"
   --   li (list None) "third"
 
-  el ~ bold $ "flexWrap"
-  row ~ gap 5 . width 200 . flexWrap WrapReverse $ do
-    el ~ border 1 . pad 5 $ "one"
-    el ~ border 1 . pad 5 $ "two"
-    el ~ border 1 . pad 5 $ "three"
-    el ~ border 1 . pad 5 $ "four"
-    el ~ border 1 . pad 5 $ "five"
-    el ~ border 1 . pad 5 $ "six"
-    el ~ border 1 . pad 5 $ "seven"
-    el ~ border 1 . pad 5 $ "eight"
-    el ~ border 1 . pad 5 $ "nine"
-
-  el ~ bold $ "White Space: text wrap"
-  el ~ border 1 . width 200 . whiteSpace NoWrap . overflow Hidden $ text lorem
-  el ~ border 1 . width 200 . whiteSpace Wrap $ text lorem
-
   el ~ bold $ "css order"
   el ~ flexCol . flexRow $ do
     text "WOOT"
     text "BOOT"
 
+  el ~ bold $ "text align"
+  row  ~ gap 30 . grow $ do
+    let c = text lorem
+    tAlign c AlignLeft    "left"
+    tAlign c AlignCenter  "center"
+    tAlign c AlignRight   "right"
+    tAlign c AlignJustify "justify"
+
+  where
+    tAlign c align t = col $ do
+                            el t
+                            el ~ pad 10 . textAlign align . border 1 $ c
 
 lorem :: Text
 lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
+whiteSpaceText :: Html ()
+whiteSpaceText = do
+    col $ do
+      el ~ bold $ "White Space: text wrap"
+
+      row ~ gap 30 . pad 10 $ do
+        -- inspired from https://css-tricks.com/almanac/properties/w/whitespace/
+        whiteSpaces Wrap "Wrap"
+        whiteSpaces PreWrap "PreWrap"
+        whiteSpaces PreLine "PreLine"
+        whiteSpaces BreakSpaces "BreakSpaces"
+        whiteSpaces NoWrap "NoWrap"
+        whiteSpaces Pre "Pre"
+  where
+    wSpace c align wrap t = col $ do
+                              el t
+                              el ~ pad 10 . textAlign align . whiteSpace wrap . border 1 . overflow Hidden $ c
+    intersperseWithSpace sp ts = Html () $ intersperse sp $ map Text ts
+    whiteSpaces algn algnT = col ~ width 100 . grow $ do
+                           el algnT
+                           col ~ pad 20 . gap 20 . border 1 $ do
+                             let t sp = intersperseWithSpace (Raw sp) $ T.words lorem
+                             wSpace (t " ") AlignLeft algn "[space]"
+                             wSpace (t "&thinsp;") AlignLeft algn "&thinsp;"
+                             wSpace (t "&nbsp;") AlignLeft algn "&nbsp;"
+                             wSpace (t "&emsp;") AlignLeft algn "&emsp;"
+                             wSpace (t "&zwj;") AlignLeft algn "&zwj;"
+                             wSpace (t "&zwj;") AlignLeft algn "&zwj;"
+                             wSpace (t "&zwnj;") AlignLeft algn "&zwnj;"
 
 longContent :: Html ()
 longContent = do
@@ -274,6 +320,123 @@ longContent = do
                 row $ do
                   tag "div" ~ bg Light . pad (XY 10 2) . fontSize 16 . textAlign AlignCenter $ text lang
 
+layout :: Html ()
+layout = col ~ grow $ do
+  row  ~ pad 10 . gap 30 $ do
+    col $ do
+      el ~ bold $ "spaces around & between elements"
+      row ~ gap 30 $ do
+        col ~ pad 10 . grow $ do
+          el "pad 20"
+          row ~ flexCol . border 1 . pad 20 . bg Warning $ do
+            el ~ border 1 . bg White $ "one"
+            el ~ border 1 . bg White $ "two"
+            el ~ border 1 . bg White $ "three"
+        col ~ pad 10 . grow $ do
+          el "gap 20"
+          row ~ flexCol . border 1 . gap 20 . bg Warning $ do
+            el ~ border 1 . bg White $ "one"
+            el ~ border 1 . bg White $ "two"
+            el ~ border 1 . bg White $ "three"
+        col ~ pad 10 . grow $ do
+          el "pad 20 . gap 20"
+          row ~ flexCol . border 1 . pad 20 . gap 20 . bg Warning $ do
+            el ~ border 1 . bg White $ "one"
+            el ~ border 1 . bg White $ "two"
+            el ~ border 1 . bg White $ "three"
+  -- inspired from: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+  col ~ pad 10 . gap 30 . grow $ do
+    el ~ bold $ "flexWrap"
+    row  ~ pad 10 . gap 30 $ do
+      col $ do
+        space
+        el "flex-direction: row"
+        flexDir row
+      col $ do
+        space
+        el "flex-direction: column"
+        flexDir col
+      col $ do
+        space
+        el "flex-wrap: wrap"
+        flexWrap' Wrap
+      col $ do
+        space
+        el "flex-wrap: wrap-reverse"
+        flexWrap' WrapReverse
+    row  ~ pad 10 . gap 30 $ do
+      col ~ grow $ do
+        el "flex-grow"
+        flexGrow
+    col ~ pad 10 . gap 30 . grow $ do
+      el ~ bold $ "vertical positioning by using `space`"
+      row  ~ pad 10 . gap 30 . grow $ do
+        col ~ pad 10 $ do
+          el "flex-start"
+          flexStart
+        col ~ pad 10 . grow $ do
+          el "flex-center"
+          flexCenter
+        col ~ pad 10 . grow $ do
+          el "flex-end"
+          flexEnd
+        col ~ pad 10 . grow $ do
+          el "space-between"
+          spaceBetween
+        col ~ pad 10 . grow $ do
+          el "space-around"
+          spaceAround
+  where
+    box x = el ~ border 1 . pad 10 $ x
+    flexDir dir = do
+      dir ~ border 1 . pad 30 $ do
+        do
+          box "one"
+          box "two"
+          box "three"
+    flexWrap' wrap = do
+      row ~ flexWrap wrap . border 1 . pad 10 $ do
+          box "one"
+          box "two"
+          box "three"
+          box "four"
+          box "five"
+          box "six"
+          box "seven"
+          box "eight"
+          box "nine"
+          box "ten"
+          box "eleven"
+          box "twelve"
+    flexGrow = do
+      row ~ border 1 . pad 30 $ do
+        do
+          box "one"
+          box ~ grow $ "two"
+          box "three"
+    r1 = row $ do
+          box ~ grow $ "one"
+          box ~ grow $ "two"
+          box "three"
+    r2 = row $ do
+          box "four"
+          box "five"
+          box ~ grow $ "six"
+          box "seven"
+    r3 = row $ do
+          box "eight"
+          box "nine"
+    spaceYellow = el ~ bg Warning . grow $ space
+    flexStart = box ~ grow $ do
+      r1 >> r2 >> r3
+    flexCenter = col ~ border 1 . pad 10 . grow $ do
+         spaceYellow >> r1 >> r2 >> r3 >> spaceYellow
+    flexEnd = col ~ border 1 . pad 10 . grow $ do
+         spaceYellow >> r1 >> r2 >> r3
+    spaceBetween = col ~ border 1 . pad 10 . grow $ do
+         r1 >> spaceYellow >> r2 >> spaceYellow >> r3
+    spaceAround = col ~ border 1 . pad 10 . grow $ do
+         spaceYellow >> r1 >> spaceYellow >> r2 >> spaceYellow >> r3 >> spaceYellow
 
 -- rows = textAlign AlignCenter . border 1 . borderColor GrayLight
 
@@ -285,12 +448,13 @@ examples = col ~ pad 20 . gap 15 $ do
   link "holygrail" "Holy Grail"
   link "stacks" "Stacks"
   link "text" "Text"
+  link "whitespace-text" "Whitespace Text"
   link "inputs" "Inputs"
   link "tooltips" "Tooltips"
   link "long-content" "Long Content"
+  link "layout" "Layout"
  where
   link href = tag "a" @ att "href" href ~ color Primary
-
 
 app :: Application
 app req respond = do
@@ -301,9 +465,11 @@ app req respond = do
     ["holygrail"] -> view holygrail
     ["stacks"] -> view stacks
     ["text"] -> view texts
+    ["whitespace-text"] -> view whiteSpaceText
     ["inputs"] -> view inputs
     ["tooltips"] -> view tooltips
     ["long-content"] -> view longContent
+    ["layout"] -> view layout
     ["static", "reset.css"] -> reset
     _ -> notFound
  where
