@@ -52,7 +52,7 @@ extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
 common warnings
-    ghc-options: -Wall
+    ghc-options: -Wall -threaded
 
 executable example
     -- Import common warning flags.
